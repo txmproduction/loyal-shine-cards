@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CgvRouteImport } from './routes/cgv'
+import { Route as DpaRouteImport } from './routes/dpa'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AuthenticatedCarteRouteImport } from './routes/_authenticated/carte'
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -31,6 +34,21 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CgvRoute = CgvRouteImport.update({
+  id: '/cgv',
+  path: '/cgv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DpaRoute = DpaRouteImport.update({
+  id: '/dpa',
+  path: '/dpa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedCarteRoute = AuthenticatedCarteRouteImport.update({
@@ -67,6 +85,9 @@ const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cgv': typeof CgvRoute
+  '/dpa': typeof DpaRoute
+  '/privacy': typeof PrivacyRoute
   '/carte': typeof AuthenticatedCarteRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -77,6 +98,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cgv': typeof CgvRoute
+  '/dpa': typeof DpaRoute
+  '/privacy': typeof PrivacyRoute
   '/carte': typeof AuthenticatedCarteRoute
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -89,6 +113,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/cgv': typeof CgvRoute
+  '/dpa': typeof DpaRoute
+  '/privacy': typeof PrivacyRoute
   '/_authenticated/carte': typeof AuthenticatedCarteRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -101,6 +128,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/cgv'
+    | '/dpa'
+    | '/privacy'
     | '/carte'
     | '/clients'
     | '/dashboard'
@@ -111,6 +141,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/cgv'
+    | '/dpa'
+    | '/privacy'
     | '/carte'
     | '/clients'
     | '/dashboard'
@@ -122,6 +155,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/cgv'
+    | '/dpa'
+    | '/privacy'
     | '/_authenticated/carte'
     | '/_authenticated/clients'
     | '/_authenticated/dashboard'
@@ -134,6 +170,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CgvRoute: typeof CgvRoute
+  DpaRoute: typeof DpaRoute
+  PrivacyRoute: typeof PrivacyRoute
   RejoindreCodeRoute: typeof RejoindreCodeRoute
 }
 
@@ -158,6 +197,27 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cgv': {
+      id: '/cgv'
+      path: '/cgv'
+      fullPath: '/cgv'
+      preLoaderRoute: typeof CgvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dpa': {
+      id: '/dpa'
+      path: '/dpa'
+      fullPath: '/dpa'
+      preLoaderRoute: typeof DpaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/carte': {
@@ -228,6 +288,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CgvRoute: CgvRoute,
+  DpaRoute: DpaRoute,
+  PrivacyRoute: PrivacyRoute,
   RejoindreCodeRoute: RejoindreCodeRoute,
 }
 export const routeTree = rootRouteImport
