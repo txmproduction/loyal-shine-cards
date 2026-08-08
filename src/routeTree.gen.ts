@@ -20,7 +20,6 @@ import { Route as AuthenticatedCarteRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticated/employes'
-import { Route as AuthenticatedPointsRouteImport } from './routes/_authenticated/points'
 import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
 
 const IndexRoute = IndexRouteImport.update({
@@ -77,11 +76,6 @@ const AuthenticatedEmployesRoute = AuthenticatedEmployesRouteImport.update({
   path: '/employes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedPointsRoute = AuthenticatedPointsRouteImport.update({
-  id: '/points',
-  path: '/points',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
   id: '/rejoindre/$code',
   path: '/rejoindre/$code',
@@ -99,7 +93,6 @@ export interface FileRoutesByFullPath {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
-  '/points': typeof AuthenticatedPointsRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRoutesByTo {
@@ -113,7 +106,6 @@ export interface FileRoutesByTo {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
-  '/points': typeof AuthenticatedPointsRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRoutesById {
@@ -129,7 +121,6 @@ export interface FileRoutesById {
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/employes': typeof AuthenticatedEmployesRoute
-  '/_authenticated/points': typeof AuthenticatedPointsRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRouteTypes {
@@ -145,7 +136,6 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/employes'
-    | '/points'
     | '/rejoindre/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -159,7 +149,6 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/employes'
-    | '/points'
     | '/rejoindre/$code'
   id:
     | '__root__'
@@ -174,7 +163,6 @@ export interface FileRouteTypes {
     | '/_authenticated/clients'
     | '/_authenticated/dashboard'
     | '/_authenticated/employes'
-    | '/_authenticated/points'
     | '/rejoindre/$code'
   fileRoutesById: FileRoutesById
 }
@@ -267,13 +255,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmployesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/points': {
-      id: '/_authenticated/points'
-      path: '/points'
-      fullPath: '/points'
-      preLoaderRoute: typeof AuthenticatedPointsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/rejoindre/$code': {
       id: '/rejoindre/$code'
       path: '/rejoindre/$code'
@@ -290,7 +271,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmployesRoute: typeof AuthenticatedEmployesRoute
-  AuthenticatedPointsRoute: typeof AuthenticatedPointsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -299,7 +279,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientsRoute: AuthenticatedClientsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmployesRoute: AuthenticatedEmployesRoute,
-  AuthenticatedPointsRoute: AuthenticatedPointsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -317,3 +296,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

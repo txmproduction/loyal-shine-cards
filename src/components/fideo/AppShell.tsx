@@ -1,13 +1,21 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, PlusCircle, IdCard, BadgeCheck, LogOut, ShieldCheck } from "lucide-react";
-import type { ReactNode } from "react";
+import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLine } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
+import { QrScanner } from "@/components/fideo/QrScanner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND_LOGO, accessState, trialDaysLeft, useIsAdmin, useMerchant } from "@/lib/fideo";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "Vue d'ensemble", icon: LayoutDashboard },
-  { to: "/points", label: "Ajouter un point", icon: PlusCircle },
   { to: "/clients", label: "Clients", icon: Users },
   { to: "/employes", label: "Employés", icon: BadgeCheck },
   { to: "/carte", label: "Carte de fidélité", icon: IdCard },
@@ -18,6 +26,17 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [scanOpen, setScanOpen] = useState(false);
+
+  const onScan = (text: string) => {
+    setScanOpen(false);
+    const id = text.trim().split("/").pop() ?? "";
+    if (!id) {
+      toast.error("QR code illisible");
+      return;
+    }
+    void navigate({ to: "/clients", search: { c: id } });
+  };
   const nav = isAdmin
     ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const]
     : NAV;
@@ -102,6 +121,27 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
         <main className="animate-fade px-4 py-6 sm:px-8 sm:py-10">{children}</main>
       </div>
+
+      <button
+        onClick={() => setScanOpen(true)}
+        aria-label="Scanner un client"
+        className="bg-brand fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-violet transition-transform duration-200 hover:scale-105 active:scale-95"
+      >
+        <ScanLine className="h-5 w-5" />
+        <span className="hidden sm:inline">Scanner un client</span>
+      </button>
+
+      <Dialog open={scanOpen} onOpenChange={setScanOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Scanner un client</DialogTitle>
+            <DialogDescription>
+              Approchez le QR code de la carte de fidélité du client.
+            </DialogDescription>
+          </DialogHeader>
+          {scanOpen && <QrScanner onResult={onScan} onError={(m) => toast.error(m)} />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
