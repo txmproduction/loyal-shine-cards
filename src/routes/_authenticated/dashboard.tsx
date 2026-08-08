@@ -247,6 +247,10 @@ function Dashboard() {
 
       <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
         <h2 className="text-base font-bold">Votre carte</h2>
+      </section>
+    </div>
+  );
+}
         <p className="mb-4 text-xs text-muted-foreground">
           {card ? `${card.nb_points_pour_recompense} passages = ${card.valeur_recompense}` : "—"}
         </p>
