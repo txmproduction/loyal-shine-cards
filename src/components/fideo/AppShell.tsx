@@ -38,12 +38,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         }
       : state === "expired"
         ? {
-            text: "Essai gratuit terminé — contactez-nous pour activer votre accès",
+            text: "Essai gratuit terminé — mettez à jour votre moyen de paiement, vos QR codes sont désactivés",
             cls: "bg-destructive text-destructive-foreground",
           }
         : state === "suspended"
           ? {
-              text: "Accès suspendu — paiement en attente",
+              text: "Accès suspendu — mettez à jour votre moyen de paiement, vos QR codes sont désactivés",
               cls: "bg-destructive text-destructive-foreground",
             }
           : null;

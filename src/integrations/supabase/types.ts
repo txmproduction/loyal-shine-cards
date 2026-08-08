@@ -341,6 +341,7 @@ export type Database = {
       get_public_establishment: {
         Args: { _code: string }
         Returns: {
+          acces_actif: boolean
           couleur_marque: string
           establishment_id: string
           establishment_nom: string
