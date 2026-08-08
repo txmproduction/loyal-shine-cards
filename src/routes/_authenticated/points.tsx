@@ -24,6 +24,10 @@ import {
   usePoints,
   useRedeemReward,
   useRewards,
+  cardGoal,
+  customerName,
+  entryValue,
+  isAmountMode,
 } from "@/lib/fideo";
 
 export const Route = createFileRoute("/_authenticated/points")({
@@ -60,20 +64,26 @@ function AddPointPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
+  const [newFirstName, setNewFirstName] = useState("");
   const [newPhone, setNewPhone] = useState("");
+  const [montant, setMontant] = useState("");
 
-  const goal = card?.nb_points_pour_recompense ?? 10;
+  const amountMode = isAmountMode(card);
+  const goal = cardGoal(card);
+  const fmt = (n: number) => (amountMode ? `${n.toFixed(2)} €` : `${n}`);
 
   const balance = (customerId: string) => {
     const earned = (points ?? [])
       .filter((p) => p.customer_id === customerId)
-      .reduce((a, p) => a + p.points_ajoutes, 0);
+      .reduce((a, p) => a + entryValue(card, p), 0);
     const used = (rewards ?? []).filter((r) => r.customer_id === customerId).length * goal;
     return Math.max(0, earned - used);
   };
 
   const results = (customers ?? []).filter((c) =>
-    `${c.nom ?? ""} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(search.toLowerCase()),
+    `${c.prenom ?? ""} ${c.nom ?? ""} ${c.email ?? ""} ${c.telephone ?? ""}`
+      .toLowerCase()
+      .includes(search.toLowerCase()),
   );
 
   const unlock = () => {
@@ -87,30 +97,55 @@ function AddPointPage() {
   };
 
   const createCustomer = async () => {
-    if (!merchant || !newName.trim()) return;
+    if (!merchant) {
+      toast.error("Commerce introuvable");
+      return;
+    }
+    if (!newName.trim()) {
+      toast.error("Le nom est obligatoire");
+      return;
+    }
     const { data, error } = await supabase
       .from("customers")
-      .insert({ merchant_id: merchant.id, nom: newName.trim(), telephone: newPhone || null })
+      .insert({
+        merchant_id: merchant.id,
+        nom: newName.trim(),
+        prenom: newFirstName.trim() || null,
+        telephone: newPhone.trim() || null,
+        establishment_id: establishmentId || null,
+      })
       .select("id")
       .single();
-    if (error) {
-      toast.error("Création impossible");
+    if (error || !data) {
+      toast.error("Création impossible", { description: error?.message });
       return;
     }
     setSelected(data.id);
     setNewName("");
+    setNewFirstName("");
     setNewPhone("");
+    setSearch(newName.trim());
     toast.success("Client ajouté");
+    void qc.invalidateQueries({ queryKey: ["customers"] });
   };
 
   const add = async (customerId: string) => {
+    const value = amountMode ? Number(montant.replace(",", ".")) : 1;
+    if (amountMode && (!Number.isFinite(value) || value <= 0)) {
+      toast.error("Saisissez le montant dépensé");
+      return;
+    }
     await addPoint.mutateAsync({
       customer_id: customerId,
       employee_id: employeeId || null,
       establishment_id: establishmentId || null,
       points: 1,
+      montant: amountMode ? value : 0,
     });
-    toast.success("+1 point", { description: "Passage enregistré." });
+    setMontant("");
+    toast.success(amountMode ? `+${value.toFixed(2)} €` : "+1 point", {
+      description: "Passage enregistré.",
+    });
   };
 
   const selectedCustomer = (customers ?? []).find((c) => c.id === selected) ?? null;
