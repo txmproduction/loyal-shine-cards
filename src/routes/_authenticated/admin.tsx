@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheck } from "lucide-react";
-import { useAllMerchants, useIsAdmin } from "@/lib/fideo";
+import { useAllMerchants, useIsAdmin, useUpdateMerchantAccess, trialDaysLeft } from "@/lib/fideo";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -20,6 +22,25 @@ export const Route = createFileRoute("/_authenticated/admin")({
 function AdminPage() {
   const { data: isAdmin, isLoading } = useIsAdmin();
   const { data: merchants } = useAllMerchants(!!isAdmin);
+  const update = useUpdateMerchantAccess();
+
+  const setStatus = (id: string, access_status: string) => {
+    update.mutate(
+      { id, access_status },
+      {
+        onSuccess: () => toast.success("Accès mis à jour"),
+        onError: (e) => toast.error("Mise à jour impossible", { description: (e as Error).message }),
+      },
+    );
+  };
+
+  const extendTrial = (id: string, currentEnd: string) => {
+    const base = Math.max(Date.now(), new Date(currentEnd).getTime());
+    update.mutate(
+      { id, access_status: "trial", trial_ends_at: new Date(base + 14 * 86400000).toISOString() },
+      { onSuccess: () => toast.success("Essai prolongé de 14 jours") },
+    );
+  };
 
   if (isLoading) {
     return <p className="text-sm text-muted-foreground">Chargement…</p>;
@@ -65,6 +86,32 @@ function AdminPage() {
               <div className="text-right text-xs text-muted-foreground">
                 <p className="text-sm font-semibold text-foreground">{m.clients} clients</p>
                 <p>Inscrit le {new Date(m.created_at).toLocaleDateString("fr-FR")}</p>
+                <p>
+                  {m.access_status === "active"
+                    ? "Accès permanent"
+                    : m.access_status === "suspended"
+                      ? "Suspendu"
+                      : `Essai — ${trialDaysLeft(m.trial_ends_at)} j restants`}
+                </p>
+              </div>
+              <div className="flex w-full flex-wrap gap-2 sm:w-auto">
+                <Button
+                  size="sm"
+                  variant={m.access_status === "active" ? "default" : "outline"}
+                  onClick={() => setStatus(m.id, "active")}
+                >
+                  Accès permanent
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => extendTrial(m.id, m.trial_ends_at)}>
+                  +14 j d'essai
+                </Button>
+                <Button
+                  size="sm"
+                  variant={m.access_status === "suspended" ? "destructive" : "outline"}
+                  onClick={() => setStatus(m.id, "suspended")}
+                >
+                  Suspendre
+                </Button>
               </div>
             </li>
           ))}

@@ -2,7 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, Users, PlusCircle, IdCard, BadgeCheck, LogOut, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BRAND_LOGO, useIsAdmin, useMerchant } from "@/lib/fideo";
+import { BRAND_LOGO, accessState, trialDaysLeft, useIsAdmin, useMerchant } from "@/lib/fideo";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -26,6 +26,27 @@ export function AppShell({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     void navigate({ to: "/auth" });
   };
+
+  const state = accessState(merchant ?? null);
+  const days = trialDaysLeft(merchant?.trial_ends_at);
+
+  const banner =
+    state === "trial"
+      ? {
+          text: `Essai gratuit — ${days} jour${days > 1 ? "s" : ""} restant${days > 1 ? "s" : ""}`,
+          cls: "bg-brand text-primary-foreground",
+        }
+      : state === "expired"
+        ? {
+            text: "Essai gratuit terminé — contactez-nous pour activer votre accès",
+            cls: "bg-destructive text-destructive-foreground",
+          }
+        : state === "suspended"
+          ? {
+              text: "Accès suspendu — paiement en attente",
+              cls: "bg-destructive text-destructive-foreground",
+            }
+          : null;
 
   return (
     <div className="min-h-screen bg-background lg:flex">
@@ -68,7 +89,19 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
         </div>
       </aside>
-      <main className="min-w-0 flex-1 animate-fade px-4 py-6 sm:px-8 sm:py-10">{children}</main>
+      <div className="min-w-0 flex-1">
+        {banner && (
+          <div
+            className={cn(
+              "px-4 py-2 text-center text-xs font-semibold sm:text-sm",
+              banner.cls,
+            )}
+          >
+            {banner.text}
+          </div>
+        )}
+        <main className="animate-fade px-4 py-6 sm:px-8 sm:py-10">{children}</main>
+      </div>
     </div>
   );
 }
