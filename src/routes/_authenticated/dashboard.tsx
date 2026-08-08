@@ -176,6 +176,8 @@ function Dashboard() {
     window.location.reload();
   };
 
+  if (employeeLoading || employee) return null;
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
