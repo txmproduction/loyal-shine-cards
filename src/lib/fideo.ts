@@ -12,6 +12,8 @@ export type Merchant = {
   adresse: string | null;
   logo_url: string | null;
   couleur_marque: string | null;
+  trial_ends_at: string;
+  access_status: string;
 };
 
 export type LoyaltyCard = {
@@ -68,7 +70,9 @@ export function useMerchant() {
       const uid = auth.user?.id;
       const { data, error } = await supabase
         .from("merchants")
-        .select("id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque")
+        .select(
+          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status",
+        )
         .eq("user_id", uid ?? "")
         .limit(1)
         .maybeSingle();
@@ -108,7 +112,9 @@ export function useAllMerchants(enabled: boolean) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("merchants")
-        .select("id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, created_at")
+        .select(
+          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, created_at, trial_ends_at, access_status",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       const { data: customers } = await supabase.from("customers").select("merchant_id");
@@ -228,6 +234,39 @@ export function useInvalidateFideo() {
   return () => {
     void qc.invalidateQueries();
   };
+}
+
+/* ---------- Trial / access ---------- */
+
+export function trialDaysLeft(trialEndsAt?: string | null) {
+  if (!trialEndsAt) return 0;
+  const ms = new Date(trialEndsAt).getTime() - Date.now();
+  return Math.max(0, Math.ceil(ms / 86400000));
+}
+
+export function accessState(merchant?: Merchant | null) {
+  if (!merchant) return "loading" as const;
+  if (merchant.access_status === "active") return "active" as const;
+  if (merchant.access_status === "suspended") return "suspended" as const;
+  return trialDaysLeft(merchant.trial_ends_at) > 0 ? ("trial" as const) : ("expired" as const);
+}
+
+export function useUpdateMerchantAccess() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id: string;
+      access_status?: string;
+      trial_ends_at?: string;
+    }) => {
+      const { id, ...patch } = input;
+      const { error } = await supabase.from("merchants").update(patch).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries();
+    },
+  });
 }
 
 export function useAddPoint() {

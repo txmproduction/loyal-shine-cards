@@ -187,6 +187,7 @@ export type Database = {
       }
       merchants: {
         Row: {
+          access_status: string
           adresse: string | null
           couleur_marque: string | null
           created_at: string
@@ -195,9 +196,11 @@ export type Database = {
           logo_url: string | null
           nom_commerce: string
           telephone: string | null
+          trial_ends_at: string
           user_id: string | null
         }
         Insert: {
+          access_status?: string
           adresse?: string | null
           couleur_marque?: string | null
           created_at?: string
@@ -206,9 +209,11 @@ export type Database = {
           logo_url?: string | null
           nom_commerce: string
           telephone?: string | null
+          trial_ends_at?: string
           user_id?: string | null
         }
         Update: {
+          access_status?: string
           adresse?: string | null
           couleur_marque?: string | null
           created_at?: string
@@ -217,6 +222,7 @@ export type Database = {
           logo_url?: string | null
           nom_commerce?: string
           telephone?: string | null
+          trial_ends_at?: string
           user_id?: string | null
         }
         Relationships: []
