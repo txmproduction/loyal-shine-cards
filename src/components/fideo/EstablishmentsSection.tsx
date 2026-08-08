@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { QrImage } from "@/components/fideo/QrImage";
 
-export function EstablishmentsSection({ merchantId }: { merchantId?: string }) {
+export function EstablishmentsSection({ merchantId }: { merchantId?: string | undefined }) {
   const { data: establishments } = useEstablishments(merchantId);
   const qc = useQueryClient();
   const [origin, setOrigin] = useState("");
