@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, Gift, Search, Sparkles, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,6 +47,7 @@ export const Route = createFileRoute("/_authenticated/points")({
 });
 
 function AddPointPage() {
+  const qc = useQueryClient();
   const { data: merchant } = useMerchant();
   const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: employees } = useEmployees(merchant?.id);
