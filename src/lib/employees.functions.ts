@@ -102,3 +102,47 @@ export const resetEmployeePin = createServerFn({ method: "POST" })
     if (authErr) throw new Error(authErr.message);
     return { ok: true };
   });
+
+/** Crée l'accès de connexion pour un employé existant qui n'en a pas encore. */
+export const enableEmployeeAccess = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => ({ id: input.id }))
+  .handler(async ({ data, context }) => {
+    const { data: emp, error } = await context.supabase
+      .from("employees")
+      .select("id, nom, pin_code, user_id, merchant_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!emp) throw new Error("Employé introuvable");
+    if (emp.user_id) throw new Error("Cet employé a déjà un accès");
+
+    const { data: merchant, error: mErr } = await context.supabase
+      .from("merchants")
+      .select("id, nom_commerce")
+      .eq("id", emp.merchant_id)
+      .maybeSingle();
+    if (mErr) throw new Error(mErr.message);
+    if (!merchant) throw new Error("Commerce introuvable");
+
+    const pin = /^\d{4,6}$/.test(emp.pin_code) ? emp.pin_code : "1234";
+    const email = employeeLoginEmail(merchant.nom_commerce, emp.nom);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: created, error: authErr } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: pinToPassword(pin),
+      email_confirm: true,
+      user_metadata: { is_employee: true, nom: emp.nom, merchant_id: merchant.id },
+    });
+    if (authErr || !created.user) throw new Error(authErr?.message ?? "Création de l'accès impossible");
+
+    const { error: upErr } = await context.supabase
+      .from("employees")
+      .update({ user_id: created.user.id, pin_code: pin })
+      .eq("id", emp.id);
+    if (upErr) {
+      await supabaseAdmin.auth.admin.deleteUser(created.user.id);
+      throw new Error(upErr.message);
+    }
+    return { email, pin };
+  });
