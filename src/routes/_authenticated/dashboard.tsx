@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { Award, Coins, Gift, UserPlus } from "lucide-react";
 import {
   Area,
@@ -26,6 +26,7 @@ import {
   startOfDay,
   useCustomers,
   useEmployees,
+  useEmployeeSelf,
   useLoyaltyCard,
   useMerchant,
   usePoints,
@@ -73,6 +74,13 @@ function Panel({
 }
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const { data: employee, isLoading: employeeLoading } = useEmployeeSelf();
+
+  useEffect(() => {
+    if (employee) void navigate({ to: "/clients", replace: true });
+  }, [employee, navigate]);
+
   const { data: merchant } = useMerchant();
   const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: customers } = useCustomers(merchant?.id);
@@ -167,6 +175,8 @@ function Dashboard() {
     toast.success("Données de démonstration chargées");
     window.location.reload();
   };
+
+  if (employeeLoading || employee) return null;
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
