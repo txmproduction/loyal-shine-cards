@@ -115,7 +115,7 @@ export function useEstablishments(merchantId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("establishments")
-        .select("id, nom, adresse")
+        .select("id, nom, adresse, public_code")
         .eq("merchant_id", merchantId!)
         .order("nom");
       if (error) throw error;
@@ -132,7 +132,7 @@ export function useCustomers(merchantId?: string) {
       const { data, error } = await supabase
         .from("customers")
         .select(
-          "id, nom, email, telephone, created_at, apple_wallet_pass_id, google_wallet_pass_id",
+          "id, nom, prenom, email, telephone, created_at, apple_wallet_pass_id, google_wallet_pass_id",
         )
         .eq("merchant_id", merchantId!)
         .order("created_at", { ascending: false });
@@ -149,7 +149,7 @@ export function usePoints(customerIds: string[] | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("points_history")
-        .select("id, customer_id, employee_id, establishment_id, points_ajoutes, type, date")
+        .select("id, customer_id, employee_id, establishment_id, points_ajoutes, montant, type, date")
         .in("customer_id", customerIds!)
         .order("date", { ascending: false });
       if (error) throw error;
