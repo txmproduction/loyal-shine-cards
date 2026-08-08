@@ -19,33 +19,46 @@ export type Database = {
           apple_wallet_pass_id: string | null
           created_at: string
           email: string | null
+          establishment_id: string | null
           google_wallet_pass_id: string | null
           id: string
           merchant_id: string
           nom: string | null
+          prenom: string | null
           telephone: string | null
         }
         Insert: {
           apple_wallet_pass_id?: string | null
           created_at?: string
           email?: string | null
+          establishment_id?: string | null
           google_wallet_pass_id?: string | null
           id?: string
           merchant_id: string
           nom?: string | null
+          prenom?: string | null
           telephone?: string | null
         }
         Update: {
           apple_wallet_pass_id?: string | null
           created_at?: string
           email?: string | null
+          establishment_id?: string | null
           google_wallet_pass_id?: string | null
           id?: string
           merchant_id?: string
           nom?: string | null
+          prenom?: string | null
           telephone?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "customers_establishment_id_fkey"
+            columns: ["establishment_id"]
+            isOneToOne: false
+            referencedRelation: "establishments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "customers_merchant_id_fkey"
             columns: ["merchant_id"]
@@ -99,6 +112,7 @@ export type Database = {
           longitude: number | null
           merchant_id: string
           nom: string
+          public_code: string
         }
         Insert: {
           adresse?: string | null
@@ -108,6 +122,7 @@ export type Database = {
           longitude?: number | null
           merchant_id: string
           nom: string
+          public_code?: string
         }
         Update: {
           adresse?: string | null
@@ -117,6 +132,7 @@ export type Database = {
           longitude?: number | null
           merchant_id?: string
           nom?: string
+          public_code?: string
         }
         Relationships: [
           {
@@ -134,6 +150,8 @@ export type Database = {
           design: Json
           id: string
           merchant_id: string
+          mode_recompense: string
+          montant_pour_recompense: number
           nb_points_pour_recompense: number
           valeur_recompense: string
         }
@@ -142,6 +160,8 @@ export type Database = {
           design?: Json
           id?: string
           merchant_id: string
+          mode_recompense?: string
+          montant_pour_recompense?: number
           nb_points_pour_recompense?: number
           valeur_recompense?: string
         }
@@ -150,6 +170,8 @@ export type Database = {
           design?: Json
           id?: string
           merchant_id?: string
+          mode_recompense?: string
+          montant_pour_recompense?: number
           nb_points_pour_recompense?: number
           valeur_recompense?: string
         }
@@ -206,6 +228,7 @@ export type Database = {
           employee_id: string | null
           establishment_id: string | null
           id: string
+          montant: number
           points_ajoutes: number
           type: string
         }
@@ -215,6 +238,7 @@ export type Database = {
           employee_id?: string | null
           establishment_id?: string | null
           id?: string
+          montant?: number
           points_ajoutes?: number
           type?: string
         }
@@ -224,6 +248,7 @@ export type Database = {
           employee_id?: string | null
           establishment_id?: string | null
           id?: string
+          montant?: number
           points_ajoutes?: number
           type?: string
         }
@@ -286,8 +311,27 @@ export type Database = {
     }
     Functions: {
       claim_demo_merchant: { Args: never; Returns: string }
+      get_public_establishment: {
+        Args: { _code: string }
+        Returns: {
+          couleur_marque: string
+          establishment_id: string
+          establishment_nom: string
+          logo_url: string
+          nom_commerce: string
+        }[]
+      }
       owns_customer: { Args: { _customer_id: string }; Returns: boolean }
       owns_merchant: { Args: { _merchant_id: string }; Returns: boolean }
+      register_customer_public: {
+        Args: {
+          _code: string
+          _nom: string
+          _prenom: string
+          _telephone: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
