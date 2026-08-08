@@ -99,7 +99,7 @@ function SignupPage() {
         >
           <div className="space-y-2">
             <Label htmlFor="prenom" className="text-primary-foreground/80">
-              Votre prénom
+              Nom et prénom
             </Label>
             <Input
               id="prenom"
@@ -108,7 +108,7 @@ function SignupPage() {
               onChange={(ev) => setPrenom(ev.target.value)}
               autoComplete="given-name"
               className="border-white/15 bg-white/5 text-primary-foreground placeholder:text-primary-foreground/40"
-              placeholder="Guillaume"
+              placeholder="Dupont Patrick"
             />
           </div>
           <div className="space-y-2">
