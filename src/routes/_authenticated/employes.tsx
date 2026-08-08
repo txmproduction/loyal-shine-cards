@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Copy, KeyRound, Trash2 } from "lucide-react";
+import { Copy, KeyRound, Trash2, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   createEmployeeAccount,
   deleteEmployeeAccount,
+  enableEmployeeAccess,
   resetEmployeePin,
 } from "@/lib/employees.functions";
 import { employeeLoginEmail } from "@/lib/employee-login";
@@ -45,6 +46,7 @@ function EmployeesPage() {
   const createAccount = useServerFn(createEmployeeAccount);
   const deleteAccount = useServerFn(deleteEmployeeAccount);
   const resetPin = useServerFn(resetEmployeePin);
+  const enableAccess = useServerFn(enableEmployeeAccess);
 
   const [nom, setNom] = useState("");
   const [pin, setPin] = useState("");
@@ -97,6 +99,16 @@ function EmployeesPage() {
   const copy = (value: string) => {
     void navigator.clipboard.writeText(value);
     toast.success("Identifiant copié");
+  };
+
+  const activate = async (id: string) => {
+    try {
+      const res = await enableAccess({ data: { id } });
+      toast.success("Accès créé", { description: `Identifiant : ${res.email} — PIN ${res.pin}` });
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Création impossible");
+    }
   };
 
   return (
@@ -179,6 +191,12 @@ function EmployeesPage() {
                       <KeyRound className="h-4 w-4" />
                     </Button>
                   </>
+                )}
+                {!e.user_id && (
+                  <Button variant="outline" size="sm" onClick={() => activate(e.id)}>
+                    <UserCheck className="mr-1.5 h-4 w-4" />
+                    Créer l'accès
+                  </Button>
                 )}
                 <Button variant="ghost" size="icon" onClick={() => remove(e.id)} aria-label="Supprimer">
                   <Trash2 className="h-4 w-4 text-destructive" />
