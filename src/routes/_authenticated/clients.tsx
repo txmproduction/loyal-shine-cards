@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { Apple, Gift, QrCode, ScanLine, Search, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -31,6 +31,9 @@ import {
 } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/clients")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    c: typeof search['c'] === "string" ? (search['c'] as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Clients — Fidéo" },
@@ -46,6 +49,8 @@ export const Route = createFileRoute("/_authenticated/clients")({
 });
 
 function ClientsPage() {
+  const { c: scannedId } = Route.useSearch();
+  const navigate = useNavigate();
   const { data: merchant } = useMerchant();
   const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: customers } = useCustomers(merchant?.id);
@@ -77,6 +82,19 @@ function ClientsPage() {
     setActive(c);
     setAmount(amountMode ? "" : "1");
   };
+
+  useEffect(() => {
+    if (!scannedId || !customers) return;
+    const found = customers.find((c) => c.id === scannedId);
+    if (found) {
+      setActive(found);
+      setAmount(isAmountMode(card) ? "" : "1");
+    } else {
+      toast.error("QR code inconnu", { description: "Ce client n'appartient pas à votre commerce." });
+    }
+    void navigate({ to: "/clients", search: {}, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scannedId, customers]);
 
   const onScan = (text: string) => {
     setScanOpen(false);
