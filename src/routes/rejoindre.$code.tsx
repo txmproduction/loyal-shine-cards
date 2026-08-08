@@ -215,12 +215,3 @@ function JoinPage() {
     </Centered>
   );
 }
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/rejoindre/$code')({
-  component: RouteComponent,
-})
-
-function RouteComponent() {
-  return <div>Hello "/rejoindre/$code"!</div>
-}
