@@ -31,6 +31,7 @@ export type Employee = {
   nom: string;
   pin_code: string;
   role: string;
+  user_id?: string | null;
 };
 
 export type Establishment = {
@@ -68,16 +69,52 @@ export function useMerchant() {
     queryFn: async () => {
       const { data: auth } = await supabase.auth.getUser();
       const uid = auth.user?.id;
+      if (!uid) return null;
       const { data, error } = await supabase
         .from("merchants")
         .select(
           "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status",
         )
-        .eq("user_id", uid ?? "")
+        .eq("user_id", uid)
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      return (data as Merchant | null) ?? null;
+      if (data) return data as Merchant;
+
+      // Compte employé : on remonte le commerce auquel il est rattaché.
+      const { data: emp } = await supabase
+        .from("employees")
+        .select("merchant_id")
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (!emp) return null;
+      const { data: m } = await supabase
+        .from("merchants")
+        .select(
+          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status",
+        )
+        .eq("id", emp.merchant_id)
+        .maybeSingle();
+      return (m as Merchant | null) ?? null;
+    },
+  });
+}
+
+/** Renvoie la fiche employé du compte connecté, ou null si c'est le commerçant. */
+export function useEmployeeSelf() {
+  return useQuery({
+    queryKey: ["employee_self"],
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) return null;
+      const { data, error } = await supabase
+        .from("employees")
+        .select("id, nom, pin_code, role, user_id, merchant_id")
+        .eq("user_id", uid)
+        .maybeSingle();
+      if (error) return null;
+      return (data as (Employee & { merchant_id: string }) | null) ?? null;
     },
   });
 }
