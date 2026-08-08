@@ -9,6 +9,7 @@ import {
   isAmountMode,
   useAddPoint,
   useCustomers,
+  useEmployeeSelf,
   useLoyaltyCard,
   useMerchant,
   usePoints,
@@ -52,6 +53,7 @@ function ClientsPage() {
   const { c: scannedId } = Route.useSearch();
   const navigate = useNavigate();
   const { data: merchant } = useMerchant();
+  const { data: employee } = useEmployeeSelf();
   const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: customers } = useCustomers(merchant?.id);
   const ids = useMemo(() => (customers ?? []).map((c) => c.id), [customers]);
@@ -69,6 +71,14 @@ function ClientsPage() {
 
   const amountMode = isAmountMode(card);
   const goal = cardGoal(card);
+
+  /** Un employé ne voit que les clients qu'il a lui-même scannés. */
+  const myCustomerIds = useMemo(() => {
+    if (!employee) return null;
+    return new Set(
+      (points ?? []).filter((p) => p.employee_id === employee.id).map((p) => p.customer_id),
+    );
+  }, [employee, points]);
 
   const balanceOf = (id: string) => {
     const earned = (points ?? [])
@@ -116,7 +126,7 @@ function ClientsPage() {
     }
     await addPoint.mutateAsync({
       customer_id: active.id,
-      employee_id: null,
+      employee_id: employee?.id ?? null,
       establishment_id: null,
       points: amountMode ? 1 : Math.round(value),
       montant: amountMode ? value : 0,
@@ -129,6 +139,7 @@ function ClientsPage() {
   };
 
   const rows = (customers ?? [])
+    .filter((c) => !myCustomerIds || myCustomerIds.has(c.id) || active?.id === c.id)
     .filter((c) =>
       `${c.prenom ?? ""} ${c.nom ?? ""} ${c.email ?? ""} ${c.telephone ?? ""}`
         .toLowerCase()
