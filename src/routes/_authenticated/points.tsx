@@ -225,6 +225,20 @@ function AddPointPage() {
         className={`animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft transition-opacity ${unlocked ? "" : "pointer-events-none opacity-50"}`}
       >
         <h2 className="text-base font-bold">2. Client</h2>
+        {amountMode && (
+          <div className="mt-4 space-y-2">
+            <Label>Montant dépensé (€)</Label>
+            <Input
+              type="number"
+              min={0}
+              step="0.01"
+              value={montant}
+              onChange={(e) => setMontant(e.target.value)}
+              placeholder="25.00"
+              className="sm:w-48"
+            />
+          </div>
+        )}
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -299,7 +313,7 @@ function AddPointPage() {
       {selectedCustomer && (
         <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
           <h2 className="flex items-center gap-2 text-base font-bold">
-            <Sparkles className="h-4 w-4 text-primary" /> {selectedCustomer.nom}
+            <Sparkles className="h-4 w-4 text-primary" /> {customerName(selectedCustomer)}
           </h2>
           <div className="mt-4">
             <LoyaltyCardPreview
@@ -308,6 +322,8 @@ function AddPointPage() {
               nbPoints={goal}
               points={balance(selectedCustomer.id)}
               couleur={merchant?.couleur_marque}
+              logoUrl={merchant?.logo_url}
+              mode={amountMode ? "montant" : "passages"}
             />
           </div>
         </section>
