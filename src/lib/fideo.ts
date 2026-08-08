@@ -189,12 +189,14 @@ export function useAddPoint() {
       employee_id: string | null;
       establishment_id: string | null;
       points: number;
+      montant?: number;
     }) => {
       const { error } = await supabase.from("points_history").insert({
         customer_id: input.customer_id,
         employee_id: input.employee_id,
         establishment_id: input.establishment_id,
         points_ajoutes: input.points,
+        montant: input.montant ?? 0,
         type: "passage",
       });
       if (error) throw error;
@@ -203,6 +205,27 @@ export function useAddPoint() {
       void qc.invalidateQueries({ queryKey: ["points"] });
     },
   });
+}
+
+/* ---------- Reward mode helpers ---------- */
+
+export function isAmountMode(card?: LoyaltyCard | null) {
+  return card?.mode_recompense === "montant";
+}
+
+export function cardGoal(card?: LoyaltyCard | null) {
+  if (!card) return 10;
+  return isAmountMode(card)
+    ? Number(card.montant_pour_recompense || 0)
+    : card.nb_points_pour_recompense;
+}
+
+export function entryValue(card: LoyaltyCard | null | undefined, p: PointEntry) {
+  return isAmountMode(card) ? Number(p.montant ?? 0) : p.points_ajoutes;
+}
+
+export function customerName(c: { nom: string | null; prenom?: string | null }) {
+  return [c.prenom, c.nom].filter(Boolean).join(" ") || "Client";
 }
 
 export function useRedeemReward() {
