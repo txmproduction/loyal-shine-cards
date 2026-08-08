@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CgvRouteImport } from './routes/cgv'
+import { Route as DpaRouteImport } from './routes/dpa'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AuthenticatedCarteRouteImport } from './routes/_authenticated/carte'
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
@@ -38,6 +39,11 @@ const AuthRoute = AuthRouteImport.update({
 const CgvRoute = CgvRouteImport.update({
   id: '/cgv',
   path: '/cgv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DpaRoute = DpaRouteImport.update({
+  id: '/dpa',
+  path: '/dpa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cgv': typeof CgvRoute
+  '/dpa': typeof DpaRoute
   '/privacy': typeof PrivacyRoute
   '/carte': typeof AuthenticatedCarteRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cgv': typeof CgvRoute
+  '/dpa': typeof DpaRoute
   '/privacy': typeof PrivacyRoute
   '/carte': typeof AuthenticatedCarteRoute
   '/clients': typeof AuthenticatedClientsRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/cgv': typeof CgvRoute
+  '/dpa': typeof DpaRoute
   '/privacy': typeof PrivacyRoute
   '/_authenticated/carte': typeof AuthenticatedCarteRoute
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cgv'
+    | '/dpa'
     | '/privacy'
     | '/carte'
     | '/clients'
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cgv'
+    | '/dpa'
     | '/privacy'
     | '/carte'
     | '/clients'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/cgv'
+    | '/dpa'
     | '/privacy'
     | '/_authenticated/carte'
     | '/_authenticated/clients'
@@ -159,6 +171,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CgvRoute: typeof CgvRoute
+  DpaRoute: typeof DpaRoute
   PrivacyRoute: typeof PrivacyRoute
   RejoindreCodeRoute: typeof RejoindreCodeRoute
 }
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       path: '/cgv'
       fullPath: '/cgv'
       preLoaderRoute: typeof CgvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dpa': {
+      id: '/dpa'
+      path: '/dpa'
+      fullPath: '/dpa'
+      preLoaderRoute: typeof DpaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -269,6 +289,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CgvRoute: CgvRoute,
+  DpaRoute: DpaRoute,
   PrivacyRoute: PrivacyRoute,
   RejoindreCodeRoute: RejoindreCodeRoute,
 }
