@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Apple, Check, Smartphone } from "lucide-react";
+import { Apple, Check, CreditCard, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND_LOGO } from "@/lib/fideo";
 import { QrImage } from "@/components/fideo/QrImage";
@@ -54,6 +54,7 @@ type PublicEstablishment = {
   nom_commerce: string;
   logo_url: string | null;
   couleur_marque: string | null;
+  acces_actif: boolean;
 };
 
 function JoinPage() {
@@ -113,6 +114,23 @@ function JoinPage() {
         <p className="text-center text-sm text-muted-foreground">
           Ce QR code ne correspond à aucun établissement.
         </p>
+      </Centered>
+    );
+  }
+
+  if (!place.acces_actif) {
+    return (
+      <Centered>
+        <div className="animate-rise space-y-4 rounded-3xl border border-border bg-card p-6 text-center shadow-soft">
+          <span className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <CreditCard className="h-6 w-6" />
+          </span>
+          <h1 className="text-xl font-extrabold">Programme indisponible</h1>
+          <p className="text-sm text-muted-foreground">
+            Ce QR code est désactivé. L'accès du commerce est suspendu : merci de mettre à jour
+            votre moyen de paiement dans votre espace Fidéo pour le réactiver.
+          </p>
+        </div>
       </Centered>
     );
   }

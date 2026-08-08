@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Download } from "lucide-react";
+import { Download, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useEstablishments } from "@/lib/fideo";
+import { accessState, useEstablishments, useMerchant } from "@/lib/fideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,8 @@ import { QrImage } from "@/components/fideo/QrImage";
 
 export function EstablishmentsSection({ merchantId }: { merchantId?: string | undefined }) {
   const { data: establishments } = useEstablishments(merchantId);
+  const { data: merchant } = useMerchant();
+  const locked = ["suspended", "expired"].includes(accessState(merchant ?? null));
   const qc = useQueryClient();
   const [origin, setOrigin] = useState("");
   const [drafts, setDrafts] = useState<Record<string, { nom: string; adresse: string }>>({});
@@ -63,6 +65,12 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
         Modifiez le nom et l'adresse de votre point de vente. Imprimez le QR code fixe et posez-le sur
         le comptoir : chaque nouveau client s'inscrit seul en 10 secondes.
       </p>
+      {locked && (
+        <p className="mt-3 flex items-center gap-2 rounded-xl bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+          <Lock className="h-4 w-4 shrink-0" />
+          Vos QR codes sont désactivés : mettez à jour votre moyen de paiement pour les réactiver.
+        </p>
+      )}
 
       <ul className="mt-4 space-y-4">
         {(establishments ?? []).map((e) => {
@@ -95,15 +103,28 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
                     <Button size="sm" onClick={() => save(e.id)}>
                       Enregistrer
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => download(url, e.nom)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={locked}
+                      onClick={() => download(url, e.nom)}
+                    >
                       <Download className="mr-1 h-4 w-4" /> QR code
                     </Button>
                   </div>
-                  <p className="break-all text-[11px] text-muted-foreground">{url}</p>
+                  {!locked && (
+                    <p className="break-all text-[11px] text-muted-foreground">{url}</p>
+                  )}
                 </div>
-                <div className="h-fit rounded-xl bg-white p-2">
-                  <QrImage value={url} size={128} alt={`QR code ${e.nom}`} />
-                </div>
+                {locked ? (
+                  <div className="flex h-[144px] w-[144px] items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                    <Lock className="h-6 w-6" />
+                  </div>
+                ) : (
+                  <div className="h-fit rounded-xl bg-white p-2">
+                    <QrImage value={url} size={128} alt={`QR code ${e.nom}`} />
+                  </div>
+                )}
               </div>
             </li>
           );
@@ -113,8 +134,7 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
         )}
       </ul>
       <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
-        Besoin d'un établissement supplémentaire ? C'est une option payante : contactez-nous pour
-        l'activer sur votre compte.
+        Besoin d'un établissement supplémentaire ? Contactez-nous pour l'activer sur votre compte.
       </p>
     </section>
   );
