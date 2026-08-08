@@ -25,6 +25,7 @@ import {
   pctChange,
   startOfDay,
   useCustomers,
+  useEmployees,
   useLoyaltyCard,
   useMerchant,
   usePoints,
@@ -78,6 +79,7 @@ function Dashboard() {
   const ids = useMemo(() => (customers ?? []).map((c) => c.id), [customers]);
   const { data: points } = usePoints(ids);
   const { data: rewards } = useRewards(ids);
+  const { data: employees } = useEmployees(merchant?.id);
   const [claiming, setClaiming] = useState(false);
 
   const now = new Date();
@@ -139,6 +141,20 @@ function Dashboard() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customers]);
+
+  const perEmployee = useMemo(() => {
+    const rows = (employees ?? []).map((e) => {
+      const mine = pts.filter((p) => p.employee_id === e.id);
+      return {
+        id: e.id,
+        nom: e.nom,
+        passages: mine.length,
+        clients: new Set(mine.map((p) => p.customer_id)).size,
+      };
+    });
+    return rows.sort((a, b) => b.clients - a.clients || b.passages - a.passages);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employees, points]);
 
   const claimDemo = async () => {
     setClaiming(true);
