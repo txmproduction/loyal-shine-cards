@@ -121,7 +121,7 @@ function SignupPage() {
               value={nomCommerce}
               onChange={(ev) => setNomCommerce(ev.target.value)}
               className="border-white/15 bg-white/5 text-primary-foreground placeholder:text-primary-foreground/40"
-              placeholder="La Maison Du 50"
+              placeholder="Le Comptoir de Mathilde"
             />
           </div>
           <div className="space-y-2">
