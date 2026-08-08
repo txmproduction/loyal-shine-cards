@@ -246,11 +246,32 @@ function Dashboard() {
       </div>
 
       <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
-        <h2 className="text-base font-bold">Votre carte</h2>
+        <h2 className="text-base font-bold">Classement des employés</h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Qui fait signer le plus de cartes de fidélité
+        </p>
+        <ul className="divide-y divide-border">
+          {perEmployee.map((e, i) => (
+            <li key={e.id} className="flex items-center gap-4 py-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-xs font-bold">
+                {i + 1}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold">{e.nom}</span>
+              <span className="text-xs text-muted-foreground">
+                {e.clients} client(s) · {e.passages} passage(s)
+              </span>
+            </li>
+          ))}
+          {perEmployee.length === 0 && (
+            <li className="py-6 text-center text-sm text-muted-foreground">
+              Aucun employé enregistré.
+            </li>
+          )}
+        </ul>
       </section>
-    </div>
-  );
-}
+
+      <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <h2 className="text-base font-bold">Votre carte</h2>
         <p className="mb-4 text-xs text-muted-foreground">
           {card ? `${card.nb_points_pour_recompense} passages = ${card.valeur_recompense}` : "—"}
         </p>
