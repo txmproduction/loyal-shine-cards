@@ -25,6 +25,7 @@ import {
   pctChange,
   startOfDay,
   useCustomers,
+  useEmployees,
   useLoyaltyCard,
   useMerchant,
   usePoints,
@@ -78,6 +79,7 @@ function Dashboard() {
   const ids = useMemo(() => (customers ?? []).map((c) => c.id), [customers]);
   const { data: points } = usePoints(ids);
   const { data: rewards } = useRewards(ids);
+  const { data: employees } = useEmployees(merchant?.id);
   const [claiming, setClaiming] = useState(false);
 
   const now = new Date();
@@ -139,6 +141,20 @@ function Dashboard() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customers]);
+
+  const perEmployee = useMemo(() => {
+    const rows = (employees ?? []).map((e) => {
+      const mine = pts.filter((p) => p.employee_id === e.id);
+      return {
+        id: e.id,
+        nom: e.nom,
+        passages: mine.length,
+        clients: new Set(mine.map((p) => p.customer_id)).size,
+      };
+    });
+    return rows.sort((a, b) => b.clients - a.clients || b.passages - a.passages);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employees, points]);
 
   const claimDemo = async () => {
     setClaiming(true);
@@ -228,6 +244,31 @@ function Dashboard() {
           </ResponsiveContainer>
         </Panel>
       </div>
+
+      <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <h2 className="text-base font-bold">Classement des employés</h2>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Qui fait signer le plus de cartes de fidélité
+        </p>
+        <ul className="divide-y divide-border">
+          {perEmployee.map((e, i) => (
+            <li key={e.id} className="flex items-center gap-4 py-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-xs font-bold">
+                {i + 1}
+              </span>
+              <span className="min-w-0 flex-1 truncate text-sm font-semibold">{e.nom}</span>
+              <span className="text-xs text-muted-foreground">
+                {e.clients} client(s) · {e.passages} passage(s)
+              </span>
+            </li>
+          ))}
+          {perEmployee.length === 0 && (
+            <li className="py-6 text-center text-sm text-muted-foreground">
+              Aucun employé enregistré.
+            </li>
+          )}
+        </ul>
+      </section>
 
       <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
         <h2 className="text-base font-bold">Votre carte</h2>

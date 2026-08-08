@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { BRAND_LOGO } from "@/lib/fideo";
+import { isPin, pinToPassword } from "@/lib/employee-login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,7 +44,11 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      // Les employés se connectent avec leur code PIN à la place du mot de passe.
+      const credentials = isPin(password)
+        ? { email, password: pinToPassword(password) }
+        : { email, password };
+      const { error } = await supabase.auth.signInWithPassword(credentials);
       if (error) throw error;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
@@ -88,8 +93,11 @@ function AuthPage() {
             <img src={BRAND_LOGO} alt="Logo Fidéo" className="h-10 w-10 object-contain" />
             <span className="font-display text-lg font-extrabold">Fidéo</span>
           </div>
-          <h2 className="text-2xl font-bold">Connexion commerçant</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Accédez à votre tableau de bord.</p>
+          <h2 className="text-2xl font-bold">Connexion</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Commerçant : email + mot de passe. Employé : l'email fourni par votre employeur + votre
+            code PIN.
+          </p>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
             <div className="space-y-2">
@@ -104,12 +112,12 @@ function AuthPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">Mot de passe ou code PIN</Label>
               <Input
                 id="password"
                 type="password"
                 required
-                minLength={6}
+                minLength={4}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

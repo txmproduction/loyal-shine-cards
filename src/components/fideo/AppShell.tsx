@@ -11,7 +11,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { BRAND_LOGO, accessState, trialDaysLeft, useIsAdmin, useMerchant } from "@/lib/fideo";
+import {
+  BRAND_LOGO,
+  accessState,
+  trialDaysLeft,
+  useEmployeeSelf,
+  useIsAdmin,
+  useMerchant,
+} from "@/lib/fideo";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -24,6 +31,7 @@ const NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const { data: merchant } = useMerchant();
   const { data: isAdmin } = useIsAdmin();
+  const { data: employee } = useEmployeeSelf();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [scanOpen, setScanOpen] = useState(false);
@@ -37,9 +45,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
     void navigate({ to: "/clients", search: { c: id } });
   };
-  const nav = isAdmin
-    ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const]
-    : NAV;
+  const nav = employee
+    ? ([{ to: "/clients", label: "Mes clients", icon: Users }] as const)
+    : isAdmin
+      ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const]
+      : NAV;
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -75,7 +85,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div>
             <p className="font-display text-lg font-bold leading-none">Fidéo</p>
             <p className="mt-1 text-xs text-sidebar-foreground/60">
-              {merchant?.nom_commerce ?? "Votre commerce"}
+              {employee
+                ? `${merchant?.nom_commerce ?? "Commerce"} · ${employee.nom}`
+                : (merchant?.nom_commerce ?? "Votre commerce")}
             </p>
           </div>
         </div>
