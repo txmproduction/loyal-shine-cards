@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Apple, Check, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,9 +64,7 @@ function JoinPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [customerId, setCustomerId] = useState<string | null>(null);
-  const [origin, setOrigin] = useState("");
 
-  useEffect(() => setOrigin(window.location.origin), []);
 
   const { data: place, isLoading } = useQuery({
     queryKey: ["public_establishment", code],
