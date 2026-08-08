@@ -11,7 +11,7 @@ export function LoyaltyCardPreview({
   valeurRecompense: string;
   nbPoints: number;
   points?: number;
-  couleur?: string | null;
+  couleur?: string | null | undefined;
 }) {
   return (
     <div
