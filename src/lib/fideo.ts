@@ -20,6 +20,8 @@ export type LoyaltyCard = {
   nb_points_pour_recompense: number;
   valeur_recompense: string;
   design: unknown;
+  mode_recompense: string;
+  montant_pour_recompense: number;
 };
 
 export type Employee = {
@@ -33,11 +35,13 @@ export type Establishment = {
   id: string;
   nom: string;
   adresse: string | null;
+  public_code: string;
 };
 
 export type Customer = {
   id: string;
   nom: string | null;
+  prenom: string | null;
   email: string | null;
   telephone: string | null;
   created_at: string;
@@ -51,6 +55,7 @@ export type PointEntry = {
   employee_id: string | null;
   establishment_id: string | null;
   points_ajoutes: number;
+  montant: number;
   type: string;
   date: string;
 };
