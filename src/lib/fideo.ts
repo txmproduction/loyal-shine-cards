@@ -191,7 +191,7 @@ export function useEmployees(merchantId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("employees")
-        .select("id, nom, pin_code, role")
+        .select("id, nom, pin_code, role, user_id")
         .eq("merchant_id", merchantId!)
         .order("nom");
       if (error) throw error;
