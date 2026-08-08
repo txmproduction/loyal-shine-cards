@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Apple, Check, CreditCard, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND_LOGO } from "@/lib/fideo";
+import { generateWalletCard } from "@/lib/wallet.functions";
 import { QrImage } from "@/components/fideo/QrImage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,7 +67,25 @@ function JoinPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [customerId, setCustomerId] = useState<string | null>(null);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletError, setWalletError] = useState("");
+  const createWalletCard = useServerFn(generateWalletCard);
 
+  const addToGoogleWallet = async () => {
+    if (!customerId) return;
+    setWalletError("");
+    setWalletLoading(true);
+    try {
+      const { url } = await createWalletCard({ data: { customer_id: customerId } });
+      window.location.href = url;
+    } catch (e) {
+      setWalletError(
+        e instanceof Error ? e.message : "Impossible de générer la carte Google Wallet.",
+      );
+    } finally {
+      setWalletLoading(false);
+    }
+  };
 
   const { data: place, isLoading } = useQuery({
     queryKey: ["public_establishment", code],
@@ -167,9 +187,16 @@ function JoinPage() {
             <Button variant="secondary" disabled className="justify-center">
               <Apple className="mr-2 h-4 w-4" /> Ajouter à Apple Wallet — bientôt
             </Button>
-            <Button variant="secondary" disabled className="justify-center">
-              <Smartphone className="mr-2 h-4 w-4" /> Ajouter à Google Wallet — bientôt
+            <Button
+              variant="secondary"
+              className="justify-center"
+              onClick={addToGoogleWallet}
+              disabled={walletLoading}
+            >
+              <Smartphone className="mr-2 h-4 w-4" />
+              {walletLoading ? "Génération…" : "Ajouter à Google Wallet"}
             </Button>
+            {walletError && <p className="text-xs text-destructive">{walletError}</p>}
             <p className="text-xs text-muted-foreground">
               En attendant, faites une capture d'écran de ce QR code et présentez-le à chaque
               passage.
