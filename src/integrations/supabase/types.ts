@@ -76,6 +76,7 @@ export type Database = {
           nom: string
           pin_code: string
           role: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -84,6 +85,7 @@ export type Database = {
           nom: string
           pin_code: string
           role?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -92,6 +94,7 @@ export type Database = {
           nom?: string
           pin_code?: string
           role?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -338,6 +341,8 @@ export type Database = {
     }
     Functions: {
       claim_demo_merchant: { Args: never; Returns: string }
+      current_employee_id: { Args: never; Returns: string }
+      employee_merchant_id: { Args: never; Returns: string }
       get_public_establishment: {
         Args: { _code: string }
         Returns: {
