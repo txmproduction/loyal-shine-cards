@@ -20,6 +20,8 @@ export type LoyaltyCard = {
   nb_points_pour_recompense: number;
   valeur_recompense: string;
   design: unknown;
+  mode_recompense: string;
+  montant_pour_recompense: number;
 };
 
 export type Employee = {
@@ -33,11 +35,13 @@ export type Establishment = {
   id: string;
   nom: string;
   adresse: string | null;
+  public_code: string;
 };
 
 export type Customer = {
   id: string;
   nom: string | null;
+  prenom: string | null;
   email: string | null;
   telephone: string | null;
   created_at: string;
@@ -51,6 +55,7 @@ export type PointEntry = {
   employee_id: string | null;
   establishment_id: string | null;
   points_ajoutes: number;
+  montant: number;
   type: string;
   date: string;
 };
@@ -110,7 +115,7 @@ export function useEstablishments(merchantId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("establishments")
-        .select("id, nom, adresse")
+        .select("id, nom, adresse, public_code")
         .eq("merchant_id", merchantId!)
         .order("nom");
       if (error) throw error;
@@ -127,7 +132,7 @@ export function useCustomers(merchantId?: string) {
       const { data, error } = await supabase
         .from("customers")
         .select(
-          "id, nom, email, telephone, created_at, apple_wallet_pass_id, google_wallet_pass_id",
+          "id, nom, prenom, email, telephone, created_at, apple_wallet_pass_id, google_wallet_pass_id",
         )
         .eq("merchant_id", merchantId!)
         .order("created_at", { ascending: false });
@@ -144,7 +149,7 @@ export function usePoints(customerIds: string[] | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("points_history")
-        .select("id, customer_id, employee_id, establishment_id, points_ajoutes, type, date")
+        .select("id, customer_id, employee_id, establishment_id, points_ajoutes, montant, type, date")
         .in("customer_id", customerIds!)
         .order("date", { ascending: false });
       if (error) throw error;
@@ -184,12 +189,14 @@ export function useAddPoint() {
       employee_id: string | null;
       establishment_id: string | null;
       points: number;
+      montant?: number;
     }) => {
       const { error } = await supabase.from("points_history").insert({
         customer_id: input.customer_id,
         employee_id: input.employee_id,
         establishment_id: input.establishment_id,
         points_ajoutes: input.points,
+        montant: input.montant ?? 0,
         type: "passage",
       });
       if (error) throw error;
@@ -198,6 +205,27 @@ export function useAddPoint() {
       void qc.invalidateQueries({ queryKey: ["points"] });
     },
   });
+}
+
+/* ---------- Reward mode helpers ---------- */
+
+export function isAmountMode(card?: LoyaltyCard | null) {
+  return card?.mode_recompense === "montant";
+}
+
+export function cardGoal(card?: LoyaltyCard | null) {
+  if (!card) return 10;
+  return isAmountMode(card)
+    ? Number(card.montant_pour_recompense || 0)
+    : card.nb_points_pour_recompense;
+}
+
+export function entryValue(card: LoyaltyCard | null | undefined, p: PointEntry) {
+  return isAmountMode(card) ? Number(p.montant ?? 0) : p.points_ajoutes;
+}
+
+export function customerName(c: { nom: string | null; prenom?: string | null }) {
+  return [c.prenom, c.nom].filter(Boolean).join(" ") || "Client";
 }
 
 export function useRedeemReward() {

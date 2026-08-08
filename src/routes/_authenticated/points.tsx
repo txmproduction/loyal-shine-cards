@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, Gift, Search, Sparkles, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,10 @@ import {
   usePoints,
   useRedeemReward,
   useRewards,
+  cardGoal,
+  customerName,
+  entryValue,
+  isAmountMode,
 } from "@/lib/fideo";
 
 export const Route = createFileRoute("/_authenticated/points")({
@@ -42,6 +47,7 @@ export const Route = createFileRoute("/_authenticated/points")({
 });
 
 function AddPointPage() {
+  const qc = useQueryClient();
   const { data: merchant } = useMerchant();
   const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: employees } = useEmployees(merchant?.id);
@@ -60,20 +66,26 @@ function AddPointPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
+  const [newFirstName, setNewFirstName] = useState("");
   const [newPhone, setNewPhone] = useState("");
+  const [montant, setMontant] = useState("");
 
-  const goal = card?.nb_points_pour_recompense ?? 10;
+  const amountMode = isAmountMode(card);
+  const goal = cardGoal(card);
+  const fmt = (n: number) => (amountMode ? `${n.toFixed(2)} €` : `${n}`);
 
   const balance = (customerId: string) => {
     const earned = (points ?? [])
       .filter((p) => p.customer_id === customerId)
-      .reduce((a, p) => a + p.points_ajoutes, 0);
+      .reduce((a, p) => a + entryValue(card, p), 0);
     const used = (rewards ?? []).filter((r) => r.customer_id === customerId).length * goal;
     return Math.max(0, earned - used);
   };
 
   const results = (customers ?? []).filter((c) =>
-    `${c.nom ?? ""} ${c.email ?? ""} ${c.telephone ?? ""}`.toLowerCase().includes(search.toLowerCase()),
+    `${c.prenom ?? ""} ${c.nom ?? ""} ${c.email ?? ""} ${c.telephone ?? ""}`
+      .toLowerCase()
+      .includes(search.toLowerCase()),
   );
 
   const unlock = () => {
@@ -87,30 +99,55 @@ function AddPointPage() {
   };
 
   const createCustomer = async () => {
-    if (!merchant || !newName.trim()) return;
+    if (!merchant) {
+      toast.error("Commerce introuvable");
+      return;
+    }
+    if (!newName.trim()) {
+      toast.error("Le nom est obligatoire");
+      return;
+    }
     const { data, error } = await supabase
       .from("customers")
-      .insert({ merchant_id: merchant.id, nom: newName.trim(), telephone: newPhone || null })
+      .insert({
+        merchant_id: merchant.id,
+        nom: newName.trim(),
+        prenom: newFirstName.trim() || null,
+        telephone: newPhone.trim() || null,
+        establishment_id: establishmentId || null,
+      })
       .select("id")
       .single();
-    if (error) {
-      toast.error("Création impossible");
+    if (error || !data) {
+      toast.error("Création impossible", { description: error?.message });
       return;
     }
     setSelected(data.id);
     setNewName("");
+    setNewFirstName("");
     setNewPhone("");
+    setSearch(newName.trim());
     toast.success("Client ajouté");
+    void qc.invalidateQueries({ queryKey: ["customers"] });
   };
 
   const add = async (customerId: string) => {
+    const value = amountMode ? Number(montant.replace(",", ".")) : 1;
+    if (amountMode && (!Number.isFinite(value) || value <= 0)) {
+      toast.error("Saisissez le montant dépensé");
+      return;
+    }
     await addPoint.mutateAsync({
       customer_id: customerId,
       employee_id: employeeId || null,
       establishment_id: establishmentId || null,
       points: 1,
+      montant: amountMode ? value : 0,
     });
-    toast.success("+1 point", { description: "Passage enregistré." });
+    setMontant("");
+    toast.success(amountMode ? `+${value.toFixed(2)} €` : "+1 point", {
+      description: "Passage enregistré.",
+    });
   };
 
   const selectedCustomer = (customers ?? []).find((c) => c.id === selected) ?? null;
@@ -188,6 +225,20 @@ function AddPointPage() {
         className={`animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft transition-opacity ${unlocked ? "" : "pointer-events-none opacity-50"}`}
       >
         <h2 className="text-base font-bold">2. Client</h2>
+        {amountMode && (
+          <div className="mt-4 space-y-2">
+            <Label>Montant dépensé (€)</Label>
+            <Input
+              type="number"
+              min={0}
+              step="0.01"
+              value={montant}
+              onChange={(e) => setMontant(e.target.value)}
+              placeholder="25.00"
+              className="sm:w-48"
+            />
+          </div>
+        )}
         <div className="relative mt-4">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -207,9 +258,9 @@ function AddPointPage() {
                 className={`flex items-center justify-between gap-3 px-4 py-3 transition-colors ${selected === c.id ? "bg-accent" : "hover:bg-secondary"}`}
               >
                 <button className="min-w-0 flex-1 text-left" onClick={() => setSelected(c.id)}>
-                  <p className="truncate text-sm font-semibold">{c.nom ?? "Client"}</p>
+                  <p className="truncate text-sm font-semibold">{customerName(c)}</p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {c.telephone ?? c.email ?? "—"} · {b}/{goal} points
+                    {c.telephone ?? c.email ?? "—"} · {fmt(b)}/{fmt(goal)}
                   </p>
                 </button>
                 {b >= goal ? (
@@ -229,7 +280,7 @@ function AddPointPage() {
                   </Button>
                 ) : (
                   <Button size="sm" onClick={() => add(c.id)} disabled={addPoint.isPending}>
-                    +1 point
+                    {amountMode ? "Valider le montant" : "+1 point"}
                   </Button>
                 )}
               </li>
@@ -244,8 +295,13 @@ function AddPointPage() {
           <p className="flex items-center gap-2 text-sm font-semibold">
             <UserPlus className="h-4 w-4" /> Nouveau client
           </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="mt-3 grid gap-3 sm:grid-cols-4">
             <Input placeholder="Nom" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            <Input
+              placeholder="Prénom"
+              value={newFirstName}
+              onChange={(e) => setNewFirstName(e.target.value)}
+            />
             <Input placeholder="Téléphone" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
             <Button variant="outline" onClick={createCustomer} disabled={!newName.trim()}>
               Créer et sélectionner
@@ -257,7 +313,7 @@ function AddPointPage() {
       {selectedCustomer && (
         <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
           <h2 className="flex items-center gap-2 text-base font-bold">
-            <Sparkles className="h-4 w-4 text-primary" /> {selectedCustomer.nom}
+            <Sparkles className="h-4 w-4 text-primary" /> {customerName(selectedCustomer)}
           </h2>
           <div className="mt-4">
             <LoyaltyCardPreview
@@ -266,6 +322,8 @@ function AddPointPage() {
               nbPoints={goal}
               points={balance(selectedCustomer.id)}
               couleur={merchant?.couleur_marque}
+              logoUrl={merchant?.logo_url}
+              mode={amountMode ? "montant" : "passages"}
             />
           </div>
         </section>

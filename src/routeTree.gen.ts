@@ -17,6 +17,7 @@ import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticated/employes'
 import { Route as AuthenticatedPointsRouteImport } from './routes/_authenticated/points'
+import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const AuthenticatedPointsRoute = AuthenticatedPointsRouteImport.update({
   path: '/points',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
+  id: '/rejoindre/$code',
+  path: '/rejoindre/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
   '/points': typeof AuthenticatedPointsRoute
+  '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
   '/points': typeof AuthenticatedPointsRoute
+  '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/employes': typeof AuthenticatedEmployesRoute
   '/_authenticated/points': typeof AuthenticatedPointsRoute
+  '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/employes'
     | '/points'
+    | '/rejoindre/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/employes'
     | '/points'
+    | '/rejoindre/$code'
   id:
     | '__root__'
     | '/'
@@ -116,12 +127,14 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/employes'
     | '/_authenticated/points'
+    | '/rejoindre/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  RejoindreCodeRoute: typeof RejoindreCodeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPointsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/rejoindre/$code': {
+      id: '/rejoindre/$code'
+      path: '/rejoindre/$code'
+      fullPath: '/rejoindre/$code'
+      preLoaderRoute: typeof RejoindreCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -208,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  RejoindreCodeRoute: RejoindreCodeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
