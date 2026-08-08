@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,10 +25,8 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [nomCommerce, setNomCommerce] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,23 +43,8 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { nom_commerce: nomCommerce || email.split("@")[0] },
-          },
-        });
-        if (error) throw error;
-        toast.success("Compte créé", {
-          description: "Vérifiez votre boîte mail pour confirmer votre adresse.",
-        });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Une erreur est survenue");
     } finally {
@@ -105,27 +88,10 @@ function AuthPage() {
             <img src={BRAND_LOGO} alt="Logo Fidéo" className="h-10 w-10 object-contain" />
             <span className="font-display text-lg font-extrabold">Fidéo</span>
           </div>
-          <h2 className="text-2xl font-bold">
-            {mode === "login" ? "Connexion commerçant" : "Créer votre espace"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "login"
-              ? "Accédez à votre tableau de bord."
-              : "Votre carte de fidélité est prête en 30 secondes."}
-          </p>
+          <h2 className="text-2xl font-bold">Connexion commerçant</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Accédez à votre tableau de bord.</p>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
-            {mode === "signup" && (
-              <div className="space-y-2">
-                <Label htmlFor="nom">Nom du commerce</Label>
-                <Input
-                  id="nom"
-                  value={nomCommerce}
-                  onChange={(e) => setNomCommerce(e.target.value)}
-                  placeholder="La Maison Du 50"
-                />
-              </div>
-            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -150,7 +116,7 @@ function AuthPage() {
               />
             </div>
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Un instant…" : mode === "login" ? "Se connecter" : "Créer mon espace"}
+              {loading ? "Un instant…" : "Se connecter"}
             </Button>
           </form>
 
@@ -163,14 +129,10 @@ function AuthPage() {
           </Button>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "login" ? "Pas encore de compte ?" : "Déjà inscrit ?"}{" "}
-            <button
-              type="button"
-              className="font-semibold text-primary underline-offset-4 hover:underline"
-              onClick={() => setMode(mode === "login" ? "signup" : "login")}
-            >
-              {mode === "login" ? "Créer un espace" : "Se connecter"}
-            </button>
+            Pas encore de compte ?{" "}
+            <Link to="/" className="font-semibold text-primary underline underline-offset-4">
+              Créer mon compte
+            </Link>
           </p>
         </div>
       </div>
