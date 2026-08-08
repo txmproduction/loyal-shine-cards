@@ -155,8 +155,8 @@ function JoinPage() {
               <Smartphone className="mr-2 h-4 w-4" /> Ajouter à Google Wallet — bientôt
             </Button>
             <p className="text-xs text-muted-foreground">
-              En attendant, ajoutez cette page à votre écran d'accueil :{" "}
-              <span className="break-all">{origin}/carte/{customerId}</span>
+              En attendant, faites une capture d'écran de ce QR code et présentez-le à chaque
+              passage.
             </p>
           </div>
         </div>
