@@ -1,8 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, PlusCircle, IdCard, BadgeCheck, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, PlusCircle, IdCard, BadgeCheck, LogOut, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BRAND_LOGO, useMerchant } from "@/lib/fideo";
+import { BRAND_LOGO, useIsAdmin, useMerchant } from "@/lib/fideo";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -15,8 +15,12 @@ const NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { data: merchant } = useMerchant();
+  const { data: isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const nav = isAdmin
+    ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const]
+    : NAV;
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -36,7 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-col lg:overflow-visible">
-          {NAV.map(({ to, label, icon: Icon }) => {
+          {nav.map(({ to, label, icon: Icon }) => {
             const active = pathname === to;
             return (
               <Link

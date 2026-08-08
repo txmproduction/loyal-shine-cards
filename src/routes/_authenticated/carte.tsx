@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLoyaltyCard, useMerchant } from "@/lib/fideo";
 import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
+import { EstablishmentsSection } from "@/components/fideo/EstablishmentsSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -286,6 +287,8 @@ function CardSettings() {
           </div>
         </section>
       </div>
+
+      <EstablishmentsSection merchantId={merchant?.id} />
     </div>
   );
 }

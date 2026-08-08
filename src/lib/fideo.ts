@@ -64,13 +64,62 @@ export function useMerchant() {
   return useQuery({
     queryKey: ["merchant"],
     queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
       const { data, error } = await supabase
         .from("merchants")
         .select("id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque")
+        .eq("user_id", uid ?? "")
         .limit(1)
         .maybeSingle();
       if (error) throw error;
       return (data as Merchant | null) ?? null;
+    },
+  });
+}
+
+/* ---------- Admin ---------- */
+
+export type AdminMerchant = Merchant & { created_at: string; clients: number };
+
+export function useIsAdmin() {
+  return useQuery({
+    queryKey: ["is_admin"],
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) return false;
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (error) return false;
+      return !!data;
+    },
+  });
+}
+
+export function useAllMerchants(enabled: boolean) {
+  return useQuery({
+    queryKey: ["all_merchants"],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("merchants")
+        .select("id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      const { data: customers } = await supabase.from("customers").select("merchant_id");
+      const counts = new Map<string, number>();
+      for (const c of customers ?? []) {
+        counts.set(c.merchant_id, (counts.get(c.merchant_id) ?? 0) + 1);
+      }
+      return (data ?? []).map((m) => ({
+        ...(m as Merchant & { created_at: string }),
+        clients: counts.get(m.id) ?? 0,
+      })) as AdminMerchant[];
     },
   });
 }
