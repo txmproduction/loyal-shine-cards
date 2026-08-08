@@ -244,9 +244,9 @@ function AddPointPage() {
                 className={`flex items-center justify-between gap-3 px-4 py-3 transition-colors ${selected === c.id ? "bg-accent" : "hover:bg-secondary"}`}
               >
                 <button className="min-w-0 flex-1 text-left" onClick={() => setSelected(c.id)}>
-                  <p className="truncate text-sm font-semibold">{c.nom ?? "Client"}</p>
+                  <p className="truncate text-sm font-semibold">{customerName(c)}</p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {c.telephone ?? c.email ?? "—"} · {b}/{goal} points
+                    {c.telephone ?? c.email ?? "—"} · {fmt(b)}/{fmt(goal)}
                   </p>
                 </button>
                 {b >= goal ? (
@@ -266,7 +266,7 @@ function AddPointPage() {
                   </Button>
                 ) : (
                   <Button size="sm" onClick={() => add(c.id)} disabled={addPoint.isPending}>
-                    +1 point
+                    {amountMode ? "Valider le montant" : "+1 point"}
                   </Button>
                 )}
               </li>
@@ -281,8 +281,13 @@ function AddPointPage() {
           <p className="flex items-center gap-2 text-sm font-semibold">
             <UserPlus className="h-4 w-4" /> Nouveau client
           </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <div className="mt-3 grid gap-3 sm:grid-cols-4">
             <Input placeholder="Nom" value={newName} onChange={(e) => setNewName(e.target.value)} />
+            <Input
+              placeholder="Prénom"
+              value={newFirstName}
+              onChange={(e) => setNewFirstName(e.target.value)}
+            />
             <Input placeholder="Téléphone" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
             <Button variant="outline" onClick={createCustomer} disabled={!newName.trim()}>
               Créer et sélectionner
