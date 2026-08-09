@@ -78,7 +78,7 @@ function Dashboard() {
   const { data: employee, isLoading: employeeLoading } = useEmployeeSelf();
 
   useEffect(() => {
-    if (employee) void navigate({ to: "/clients", replace: true });
+    if (employee) void navigate({ to: "/clients", search: { c: undefined }, replace: true });
   }, [employee, navigate]);
 
   const { data: merchant } = useMerchant();

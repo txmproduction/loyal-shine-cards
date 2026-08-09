@@ -102,7 +102,7 @@ function ClientsPage() {
     } else {
       toast.error("QR code inconnu", { description: "Ce client n'appartient pas à votre commerce." });
     }
-    void navigate({ to: "/clients", search: {}, replace: true });
+    void navigate({ to: "/clients", search: { c: undefined }, replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scannedId, customers]);
 
