@@ -14,6 +14,10 @@ export type Merchant = {
   couleur_marque: string | null;
   trial_ends_at: string;
   access_status: string;
+  secteur?: string | null;
+  photo_url?: string | null;
+  partage_mode?: string | null;
+  onboarding_completed?: boolean;
 };
 
 export type LoyaltyCard = {
