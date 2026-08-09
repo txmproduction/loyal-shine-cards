@@ -14,6 +14,10 @@ export type Merchant = {
   couleur_marque: string | null;
   trial_ends_at: string;
   access_status: string;
+  secteur?: string | null;
+  photo_url?: string | null;
+  partage_mode?: string | null;
+  onboarding_completed?: boolean;
 };
 
 export type LoyaltyCard = {
@@ -73,7 +77,7 @@ export function useMerchant() {
       const { data, error } = await supabase
         .from("merchants")
         .select(
-          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status",
+          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status, secteur, photo_url, partage_mode, onboarding_completed",
         )
         .eq("user_id", uid)
         .limit(1)
@@ -91,7 +95,7 @@ export function useMerchant() {
       const { data: m } = await supabase
         .from("merchants")
         .select(
-          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status",
+          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status, secteur, photo_url, partage_mode, onboarding_completed",
         )
         .eq("id", emp.merchant_id)
         .maybeSingle();
@@ -150,7 +154,7 @@ export function useAllMerchants(enabled: boolean) {
       const { data, error } = await supabase
         .from("merchants")
         .select(
-          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, created_at, trial_ends_at, access_status",
+          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, created_at, trial_ends_at, access_status, secteur, photo_url, onboarding_completed",
         )
         .order("created_at", { ascending: false });
       if (error) throw error;

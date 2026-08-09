@@ -20,6 +20,7 @@ import { Route as AuthenticatedCarteRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticated/employes'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
 
 const IndexRoute = IndexRouteImport.update({
@@ -76,6 +77,11 @@ const AuthenticatedEmployesRoute = AuthenticatedEmployesRouteImport.update({
   path: '/employes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
   id: '/rejoindre/$code',
   path: '/rejoindre/$code',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRoutesByTo {
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRoutesById {
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/employes': typeof AuthenticatedEmployesRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
 }
 export interface FileRouteTypes {
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/employes'
+    | '/onboarding'
     | '/rejoindre/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/clients'
     | '/dashboard'
     | '/employes'
+    | '/onboarding'
     | '/rejoindre/$code'
   id:
     | '__root__'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/clients'
     | '/_authenticated/dashboard'
     | '/_authenticated/employes'
+    | '/_authenticated/onboarding'
     | '/rejoindre/$code'
   fileRoutesById: FileRoutesById
 }
@@ -255,6 +267,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEmployesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/rejoindre/$code': {
       id: '/rejoindre/$code'
       path: '/rejoindre/$code'
@@ -271,6 +290,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmployesRoute: typeof AuthenticatedEmployesRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -279,6 +299,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientsRoute: AuthenticatedClientsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmployesRoute: AuthenticatedEmployesRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

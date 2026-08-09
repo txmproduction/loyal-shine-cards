@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Apple, ImagePlus, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLoyaltyCard, useMerchant } from "@/lib/fideo";
+import { CARD_PALETTE, uploadImage } from "@/lib/upload";
 import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
 import { EstablishmentsSection } from "@/components/fideo/EstablishmentsSection";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ function CardSettings() {
   const { data: card } = useLoyaltyCard(merchant?.id);
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
+  const photoRef = useRef<HTMLInputElement>(null);
 
   const [mode, setMode] = useState<"passages" | "montant">("passages");
   const [nbPoints, setNbPoints] = useState(10);
@@ -41,6 +43,7 @@ function CardSettings() {
   const [couleur, setCouleur] = useState("#7C3AED");
   const [nomCommerce, setNomCommerce] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -58,8 +61,29 @@ function CardSettings() {
       setNomCommerce(merchant.nom_commerce);
       setCouleur(merchant.couleur_marque ?? "#7C3AED");
       setLogoUrl(merchant.logo_url);
+      setPhotoUrl(merchant.photo_url ?? null);
     }
   }, [merchant]);
+
+  const uploadPhoto = async (file: File) => {
+    if (!merchant) return;
+    setUploading(true);
+    try {
+      const url = await uploadImage(file, "photo");
+      setPhotoUrl(url);
+      const { error } = await supabase
+        .from("merchants")
+        .update({ photo_url: url })
+        .eq("id", merchant.id);
+      if (error) throw new Error(error.message);
+      toast.success("Photo mise à jour");
+      void qc.invalidateQueries();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload impossible");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const uploadLogo = async (file: File) => {
     const { data: session } = await supabase.auth.getUser();
@@ -119,7 +143,7 @@ function CardSettings() {
       .eq("id", card.id);
     const { error: e2 } = await supabase
       .from("merchants")
-      .update({ nom_commerce: nomCommerce, couleur_marque: couleur })
+      .update({ nom_commerce: nomCommerce, couleur_marque: couleur, photo_url: photoUrl })
       .eq("id", merchant.id);
     setSaving(false);
     if (error || e2) {
@@ -132,9 +156,14 @@ function CardSettings() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <header>
-        <h1 className="text-3xl font-extrabold">Carte de fidélité</h1>
-        <p className="text-sm text-muted-foreground">Modifiable à tout moment.</p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-extrabold">Carte de fidélité</h1>
+          <p className="text-sm text-muted-foreground">Modifiable à tout moment.</p>
+        </div>
+        <Button asChild variant="outline">
+          <Link to="/onboarding">Relancer l'assistant de configuration</Link>
+        </Button>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -240,7 +269,58 @@ function CardSettings() {
           </div>
 
           <div className="space-y-2">
-            <Label>Couleur de marque</Label>
+            <Label>Photo de la carte</Label>
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-24 items-center justify-center overflow-hidden rounded-xl border border-border bg-secondary">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="Photo du commerce" className="h-full w-full object-cover" />
+                ) : (
+                  <ImagePlus className="h-5 w-5 text-muted-foreground" />
+                )}
+              </div>
+              <div className="space-y-1">
+                <input
+                  ref={photoRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) void uploadPhoto(f);
+                    e.target.value = "";
+                  }}
+                />
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => photoRef.current?.click()} disabled={uploading}>
+                    {uploading ? "Envoi…" : "Choisir une photo"}
+                  </Button>
+                  {photoUrl && (
+                    <Button variant="ghost" onClick={() => setPhotoUrl(null)}>
+                      Retirer
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Utilisée en fond de carte (5 Mo max).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Couleur de la carte</Label>
+            <div className="flex flex-wrap items-center gap-2">
+              {CARD_PALETTE.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  aria-label={`Couleur ${c}`}
+                  onClick={() => setCouleur(c)}
+                  className={`h-8 w-8 rounded-full transition-transform hover:scale-110 ${couleur.toLowerCase() === c.toLowerCase() ? "ring-2 ring-primary ring-offset-2 ring-offset-card" : ""}`}
+                  style={{ backgroundColor: c }}
+                />
+              ))}
+            </div>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -267,6 +347,7 @@ function CardSettings() {
               points={mode === "montant" ? Math.round(montantGoal / 3) : Math.min(nbPoints, 3)}
               couleur={couleur}
               logoUrl={logoUrl}
+              photoUrl={photoUrl}
               mode={mode}
             />
           </div>
