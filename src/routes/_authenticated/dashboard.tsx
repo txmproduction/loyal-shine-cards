@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Award, Coins, Gift, UserPlus } from "lucide-react";
 import {
@@ -82,6 +82,12 @@ function Dashboard() {
   }, [employee, navigate]);
 
   const { data: merchant } = useMerchant();
+
+  useEffect(() => {
+    if (!employee && merchant && merchant.onboarding_completed === false) {
+      void navigate({ to: "/onboarding", replace: true });
+    }
+  }, [employee, merchant, navigate]);
   const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: customers } = useCustomers(merchant?.id);
   const ids = useMemo(() => (customers ?? []).map((c) => c.id), [customers]);
@@ -192,6 +198,24 @@ function Dashboard() {
         )}
       </header>
 
+      {cls.length === 0 && (
+        <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
+          <h2 className="text-base font-bold">Bienvenue sur Fidéo 🎉</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Votre carte de fidélité est prête. Il ne reste plus qu'à la faire découvrir à vos
+            clients : affichez votre QR code en boutique et scannez-les à chaque passage.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild>
+              <Link to="/carte">Inviter mon premier client</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/onboarding">Modifier ma carte</Link>
+            </Button>
+          </div>
+        </section>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Points distribués (7 j)" value={ptsWeek} delta={pctChange(ptsWeek, ptsPrev)} icon={Coins} index={0} />
         <StatCard label="Nouveaux clients (7 j)" value={newWeek} delta={pctChange(newWeek, newPrev)} icon={UserPlus} index={1} />
@@ -288,9 +312,16 @@ function Dashboard() {
         <LoyaltyCardPreview
           nomCommerce={merchant?.nom_commerce ?? "Votre commerce"}
           valeurRecompense={card?.valeur_recompense ?? "Récompense offerte"}
-          nbPoints={card?.nb_points_pour_recompense ?? 10}
+          nbPoints={
+            card?.mode_recompense === "montant"
+              ? Number(card.montant_pour_recompense || 100)
+              : (card?.nb_points_pour_recompense ?? 10)
+          }
           points={Math.min(card?.nb_points_pour_recompense ?? 10, 3)}
           couleur={merchant?.couleur_marque}
+          logoUrl={merchant?.logo_url}
+          photoUrl={merchant?.photo_url}
+          mode={card?.mode_recompense === "montant" ? "montant" : "passages"}
         />
       </section>
     </div>
