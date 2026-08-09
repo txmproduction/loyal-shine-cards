@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND_LOGO } from "@/lib/fideo";
+import { notifyAdminsNewMerchant } from "@/lib/push.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,6 +69,12 @@ function SignupPage() {
         },
       });
       if (error) throw error;
+      void notifyAdminsNewMerchant({
+        data: {
+          nomCommerce: nomCommerce.trim() || email.trim(),
+          email: email.trim(),
+        },
+      }).catch(() => undefined);
       if (data.session) {
         void navigate({ to: "/dashboard" });
       } else {
