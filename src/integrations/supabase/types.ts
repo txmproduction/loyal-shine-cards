@@ -387,8 +387,11 @@ export type Database = {
           establishment_id: string
           establishment_nom: string
           logo_url: string
+          mode_recompense: string
           nom_commerce: string
           photo_url: string
+          seuil: number
+          valeur_recompense: string
         }[]
       }
       has_role: {
