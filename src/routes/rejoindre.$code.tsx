@@ -58,6 +58,9 @@ type PublicEstablishment = {
   photo_url: string | null;
   couleur_marque: string | null;
   acces_actif: boolean;
+  mode_recompense: string | null;
+  seuil: number | null;
+  valeur_recompense: string | null;
 };
 
 function JoinPage() {
@@ -172,9 +175,10 @@ function JoinPage() {
           <div className="flex justify-center">
             <LoyaltyCardPreview
               nomCommerce={place.nom_commerce}
-              valeurRecompense="Votre récompense"
-              nbPoints={10}
+              valeurRecompense={place.valeur_recompense ?? "Récompense offerte"}
+              nbPoints={Number(place.seuil ?? 10)}
               points={0}
+              mode={place.mode_recompense === "montant" ? "montant" : "passages"}
               couleur={couleur}
               logoUrl={place.logo_url}
               photoUrl={place.photo_url}
