@@ -30,22 +30,6 @@ function concat(...parts: Uint8Array[]): Uint8Array {
 
 const enc = new TextEncoder();
 
-async function hkdf(
-  salt: Uint8Array,
-  ikm: Uint8Array,
-  info: Uint8Array,
-  length: number,
-): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey("raw", salt as BufferSource, "HKDF", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits(
-    { name: "HKDF", hash: "SHA-256", salt: new Uint8Array(0), info } as unknown as HkdfParams,
-    key,
-    0,
-  );
-  void bits;
-  return new Uint8Array(length);
-}
-
 async function hmac(key: Uint8Array, data: Uint8Array): Promise<Uint8Array> {
   const k = await crypto.subtle.importKey(
     "raw",
