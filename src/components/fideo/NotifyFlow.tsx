@@ -143,21 +143,21 @@ function PhoneMockup({
   return (
     <div className="flex justify-center py-2 [perspective:1200px]">
       <div
-        className="w-[260px] rounded-[2.6rem] border border-border/60 bg-sidebar p-2 shadow-violet transition-transform duration-500"
+        className="aspect-[9/19.5] w-[190px] rounded-[2.2rem] border border-border/60 bg-sidebar p-1.5 shadow-violet transition-transform duration-500 sm:w-[220px] sm:rounded-[2.6rem] sm:p-2"
         style={{ transform: "rotateX(6deg) rotateY(-6deg)" }}
       >
-        <div className="relative overflow-hidden rounded-[2.1rem] bg-ink-gradient px-3 pb-8 pt-3">
-          <div className="mx-auto mb-6 h-6 w-24 rounded-full bg-background/70" />
+        <div className="relative flex h-full flex-col overflow-hidden rounded-[1.8rem] bg-ink-gradient px-3 pb-5 pt-2.5 sm:rounded-[2.1rem]">
+          <div className="mx-auto mb-8 h-5 w-20 rounded-full bg-background/70 sm:mb-10 sm:h-6 sm:w-24" />
           <div className="text-center text-sidebar-foreground">
             <p className="text-sm opacity-70">
               {now.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
             </p>
-            <p className="font-display text-5xl font-bold leading-none">
+            <p className="font-display text-[2.75rem] font-bold leading-none sm:text-5xl">
               {now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
             </p>
           </div>
 
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/12 p-3 backdrop-blur-md">
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/12 p-3 backdrop-blur-md">
             <div className="flex items-start gap-2.5">
               {iconUrl ? (
                 <img
@@ -184,7 +184,7 @@ function PhoneMockup({
             </div>
           </div>
 
-          <div className="mx-auto mt-8 h-1 w-20 rounded-full bg-white/40" />
+          <div className="mx-auto mt-auto h-1 w-20 rounded-full bg-white/40" />
         </div>
       </div>
     </div>
