@@ -6,7 +6,7 @@ import { Apple, Check, CreditCard, Smartphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND_LOGO } from "@/lib/fideo";
 import { generateWalletCard } from "@/lib/wallet.functions";
-import { QrImage } from "@/components/fideo/QrImage";
+import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,6 +55,7 @@ type PublicEstablishment = {
   establishment_nom: string;
   nom_commerce: string;
   logo_url: string | null;
+  photo_url: string | null;
   couleur_marque: string | null;
   acces_actif: boolean;
 };
@@ -168,20 +169,18 @@ function JoinPage() {
               Présentez ce QR code à chaque passage chez {place.nom_commerce}.
             </p>
           </div>
-          <div
-            className="mx-auto w-full rounded-3xl p-5 text-primary-foreground"
-            style={{ backgroundImage: `linear-gradient(135deg, ${couleur}, #1a1024)` }}
-          >
-            <div className="flex items-center justify-between">
-              <p className="font-display text-lg font-bold">{place.nom_commerce}</p>
-              <img src={place.logo_url ?? BRAND_LOGO} alt="" className="h-9 w-9 object-contain" />
-            </div>
-            <div className="mt-4 rounded-2xl bg-white p-3">
-              <QrImage value={customerId} size={180} className="mx-auto" alt="Votre QR code client" />
-            </div>
-            <p className="mt-3 text-xs opacity-80">
-              {[prenom, nom].filter(Boolean).join(" ")}
-            </p>
+          <div className="flex justify-center">
+            <LoyaltyCardPreview
+              nomCommerce={place.nom_commerce}
+              valeurRecompense="Votre récompense"
+              nbPoints={10}
+              points={0}
+              couleur={couleur}
+              logoUrl={place.logo_url}
+              photoUrl={place.photo_url}
+              titulaire={[prenom, nom].filter(Boolean).join(" ")}
+              qrValue={customerId}
+            />
           </div>
           <div className="flex flex-col gap-2">
             <Button variant="secondary" disabled className="justify-center">
