@@ -15,7 +15,7 @@ export const saveAdminPushSubscription = createServerFn({ method: "POST" })
       {
         user_id: context.userId,
         endpoint: data.subscription.endpoint,
-        subscription: data.subscription as unknown as Record<string, unknown>,
+        subscription: JSON.parse(JSON.stringify(data.subscription)),
       },
       { onConflict: "endpoint" },
     );
