@@ -222,6 +222,10 @@ export type Database = {
           id: string
           logo_url: string | null
           nom_commerce: string
+          onboarding_completed: boolean
+          partage_mode: string | null
+          photo_url: string | null
+          secteur: string | null
           telephone: string | null
           trial_ends_at: string
           user_id: string | null
@@ -235,6 +239,10 @@ export type Database = {
           id?: string
           logo_url?: string | null
           nom_commerce: string
+          onboarding_completed?: boolean
+          partage_mode?: string | null
+          photo_url?: string | null
+          secteur?: string | null
           telephone?: string | null
           trial_ends_at?: string
           user_id?: string | null
@@ -248,6 +256,10 @@ export type Database = {
           id?: string
           logo_url?: string | null
           nom_commerce?: string
+          onboarding_completed?: boolean
+          partage_mode?: string | null
+          photo_url?: string | null
+          secteur?: string | null
           telephone?: string | null
           trial_ends_at?: string
           user_id?: string | null
@@ -376,6 +388,7 @@ export type Database = {
           establishment_nom: string
           logo_url: string
           nom_commerce: string
+          photo_url: string
         }[]
       }
       has_role: {
