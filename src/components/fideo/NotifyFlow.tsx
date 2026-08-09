@@ -20,7 +20,7 @@ export function NotifyFlow({
 }: {
   count: number;
   nomCommerce: string;
-  iconUrl?: string | null;
+  iconUrl?: string | null | undefined;
 }) {
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [message, setMessage] = useState("");
@@ -136,7 +136,7 @@ function PhoneMockup({
   message,
 }: {
   nomCommerce: string;
-  iconUrl?: string | null;
+  iconUrl?: string | null | undefined;
   message: string;
 }) {
   const now = new Date();
