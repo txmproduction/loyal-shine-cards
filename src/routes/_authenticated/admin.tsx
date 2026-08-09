@@ -3,6 +3,7 @@ import { ShieldCheck } from "lucide-react";
 import { useAllMerchants, useIsAdmin, useUpdateMerchantAccess, trialDaysLeft } from "@/lib/fideo";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { AdminPushToggle } from "@/components/fideo/AdminPushToggle";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -67,6 +68,8 @@ function AdminPage() {
           {(merchants ?? []).length} commerçant(s) inscrit(s) sur Fidéo.
         </p>
       </header>
+
+      <AdminPushToggle />
 
       <section className="animate-rise overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
         <ul className="divide-y divide-border">
