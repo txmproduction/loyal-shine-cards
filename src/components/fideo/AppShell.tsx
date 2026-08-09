@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLine } from "lucide-react";
+import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLine, ChevronDown } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { QrScanner } from "@/components/fideo/QrScanner";
@@ -10,6 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import {
   BRAND_LOGO,
@@ -121,6 +129,26 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <div className="min-w-0 flex-1">
+        <header className="flex items-center justify-end gap-2 border-b border-border px-4 py-2 sm:px-8">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
+              <span className="bg-brand flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold text-primary-foreground">
+                {(employee?.nom ?? merchant?.nom_commerce ?? "F").slice(0, 1).toUpperCase()}
+              </span>
+              <span className="max-w-[10rem] truncate">
+                {employee?.nom ?? merchant?.nom_commerce ?? "Mon compte"}
+              </span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={signOut}>
+                <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
         {banner && (
           <div
             className={cn(
