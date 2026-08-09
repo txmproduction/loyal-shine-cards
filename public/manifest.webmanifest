@@ -1,0 +1,24 @@
+{
+  "name": "Fidéo — Carte de fidélité digitale",
+  "short_name": "Fidéo",
+  "description": "La carte de fidélité digitale pour les commerçants.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B0B12",
+  "theme_color": "#6C5DD3",
+  "icons": [
+    {
+      "src": "https://res.cloudinary.com/dgfdye7cl/image/upload/v1785332228/3F3112CB-3549-42D3-8EE2-5B1F9C118801_ikxoy5.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://res.cloudinary.com/dgfdye7cl/image/upload/v1785332228/3F3112CB-3549-42D3-8EE2-5B1F9C118801_ikxoy5.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
