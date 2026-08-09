@@ -19,6 +19,7 @@ import {
 } from "@/lib/fideo";
 import { QrImage } from "@/components/fideo/QrImage";
 import { QrScanner } from "@/components/fideo/QrScanner";
+import { NotifyFlow } from "@/components/fideo/NotifyFlow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -164,6 +165,13 @@ function ClientsPage() {
         <Button size="lg" className="w-full sm:w-auto" onClick={() => setScanOpen(true)}>
           <ScanLine className="mr-2 h-5 w-5" /> Scanner un client
         </Button>
+        {!employee && (
+          <NotifyFlow
+            count={(customers ?? []).length}
+            nomCommerce={merchant?.nom_commerce ?? "Votre commerce"}
+            iconUrl={merchant?.logo_url ?? merchant?.photo_url ?? null}
+          />
+        )}
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
