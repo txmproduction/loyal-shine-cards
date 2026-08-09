@@ -22,7 +22,9 @@ export const generateWalletCard = createServerFn({ method: "POST" })
 
     const { data: merchant } = await supabaseAdmin
       .from("merchants")
-      .select("id, nom_commerce, logo_url, couleur_marque, access_status, trial_ends_at")
+      .select(
+        "id, nom_commerce, logo_url, photo_url, couleur_marque, access_status, trial_ends_at",
+      )
       .eq("id", customer.merchant_id)
       .maybeSingle();
     if (!merchant) throw new Error("Commerce introuvable");
@@ -89,16 +91,20 @@ export const generateWalletCard = createServerFn({ method: "POST" })
         logoUrl:
           merchant.logo_url ??
           "https://res.cloudinary.com/dgfdye7cl/image/upload/v1785332228/3F3112CB-3549-42D3-8EE2-5B1F9C118801_ikxoy5.png",
+        heroImageUrl: merchant.photo_url ?? undefined,
         backgroundColor: /^#[0-9a-f]{6}$/i.test(merchant.couleur_marque ?? "")
           ? (merchant.couleur_marque as string)
           : "#7C3AED",
         accountName: fullName,
         accountId: customer.id,
-        pointsLabel: amountMode ? "Montant cumulé" : "Passages",
+        pointsLabel: amountMode ? "Points" : "Étoiles",
         pointsValue: amountMode
           ? `${balance.toFixed(2)} € / ${goal.toFixed(2)} €`
           : `${balance} / ${goal}`,
         rewardText: card?.valeur_recompense ?? "Récompense offerte",
+        nextTierText: amountMode
+          ? `${goal.toFixed(2)} € dépensés → ${card?.valeur_recompense ?? "Récompense offerte"}`
+          : `${goal} étoiles → ${card?.valeur_recompense ?? "Récompense offerte"}`,
         barcodeValue: customer.id,
         locationName: establishmentName,
       },

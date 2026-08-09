@@ -109,12 +109,14 @@ export type WalletCardInput = {
   programName: string;
   issuerName: string;
   logoUrl: string;
+  heroImageUrl?: string | undefined;
   backgroundColor: string;
   accountName: string;
   accountId: string;
   pointsLabel: string;
   pointsValue: string;
   rewardText: string;
+  nextTierText?: string | undefined;
   barcodeValue: string;
   locationName?: string | undefined;
 };
@@ -139,6 +141,17 @@ export async function buildSaveUrl(input: WalletCardInput, origin: string): Prom
       sourceUri: { uri: input.logoUrl },
       contentDescription: { defaultValue: { language: "fr", value: input.programName } },
     },
+    ...(input.heroImageUrl
+      ? {
+          heroImage: {
+            sourceUri: { uri: input.heroImageUrl },
+            contentDescription: {
+              defaultValue: { language: "fr", value: input.issuerName },
+            },
+          },
+        }
+      : {}),
+    localizedIssuerName: { defaultValue: { language: "fr", value: input.issuerName } },
     ...(input.locationName
       ? {
           textModulesData: [
@@ -165,11 +178,29 @@ export async function buildSaveUrl(input: WalletCardInput, origin: string): Prom
     accountName: input.accountName,
     accountId: input.accountId,
     hexBackgroundColor: input.backgroundColor,
+    ...(input.heroImageUrl
+      ? {
+          heroImage: {
+            sourceUri: { uri: input.heroImageUrl },
+            contentDescription: {
+              defaultValue: { language: "fr", value: input.issuerName },
+            },
+          },
+        }
+      : {}),
     loyaltyPoints: {
       label: input.pointsLabel,
       balance: { string: input.pointsValue },
     },
-    textModulesData: [{ header: "Récompense", body: input.rewardText, id: "recompense" }],
+    textModulesData: [
+      { header: "Titulaire", body: input.accountName, id: "titulaire" },
+      {
+        header: "Prochain palier",
+        body: input.nextTierText ?? input.rewardText,
+        id: "palier",
+      },
+      { header: "Récompense", body: input.rewardText, id: "recompense" },
+    ],
     barcode: { type: "QR_CODE", value: input.barcodeValue, alternateText: "" },
   };
 
