@@ -330,8 +330,9 @@ export function useAddPoint() {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       void qc.invalidateQueries({ queryKey: ["points"] });
+      syncWalletCard(variables.customer_id);
     },
   });
 }
@@ -370,8 +371,9 @@ export function useRedeemReward() {
       });
       if (e2) throw e2;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       void qc.invalidateQueries();
+      syncWalletCard(variables.customer_id);
     },
   });
 }
