@@ -1,5 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { refreshWalletCard } from "@/lib/wallet.functions";
+
+/** Rafraîchit la carte Google Wallet du client sans bloquer le flux commerçant. */
+function syncWalletCard(customerId: string) {
+  void refreshWalletCard({ data: { customer_id: customerId } }).catch((e) => {
+    console.error("Mise à jour Google Wallet impossible", e);
+  });
+}
 
 export const BRAND_LOGO =
   "https://res.cloudinary.com/dgfdye7cl/image/upload/v1785332228/3F3112CB-3549-42D3-8EE2-5B1F9C118801_ikxoy5.png";
