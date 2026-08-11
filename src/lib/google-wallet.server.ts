@@ -135,7 +135,7 @@ export async function buildSaveUrl(input: WalletCardInput, origin: string): Prom
     id: classId,
     issuerName: input.issuerName,
     programName: input.programName,
-    reviewStatus: "UNDER_REVIEW",
+    reviewStatus: "APPROVED",
     hexBackgroundColor: input.backgroundColor,
     programLogo: {
       sourceUri: { uri: input.logoUrl },
@@ -171,39 +171,7 @@ export async function buildSaveUrl(input: WalletCardInput, origin: string): Prom
     throw new Error(`Google Wallet indisponible (${existingClass.status})`);
   }
 
-  const loyaltyObject = {
-    id: objectId,
-    classId,
-    state: "ACTIVE",
-    accountName: input.accountName,
-    accountId: input.accountId,
-    hexBackgroundColor: input.backgroundColor,
-    ...(input.heroImageUrl
-      ? {
-          heroImage: {
-            sourceUri: { uri: input.heroImageUrl },
-            contentDescription: {
-              defaultValue: { language: "fr", value: input.issuerName },
-            },
-          },
-        }
-      : {}),
-    loyaltyPoints: {
-      label: input.pointsLabel,
-      balance: { string: input.pointsValue },
-    },
-    textModulesData: [
-      { header: "Titulaire", body: input.accountName, id: "titulaire" },
-      {
-        header: "Prochain palier",
-        body: input.nextTierText ?? input.rewardText,
-        id: "palier",
-      },
-      { header: "Récompense", body: input.rewardText, id: "recompense" },
-    ],
-    barcode: { type: "QR_CODE", value: input.barcodeValue, alternateText: "" },
-  };
-
+  const loyaltyObject = buildLoyaltyObject(input, issuerId);
   const existingObject = await walletFetch(token, `/loyaltyObject/${objectId}`, "GET");
   if (existingObject.ok) {
     const updated = await walletFetch(token, `/loyaltyObject/${objectId}`, "PUT", loyaltyObject);
