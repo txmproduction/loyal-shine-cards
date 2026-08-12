@@ -22,6 +22,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticated/employes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
+import { Route as ApiPublicApplePassCustomerIdRouteImport } from './routes/api/public/apple-pass/$customerId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -87,6 +88,12 @@ const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
   path: '/rejoindre/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicApplePassCustomerIdRoute =
+  ApiPublicApplePassCustomerIdRouteImport.update({
+    id: '/api/public/apple-pass/$customerId',
+    path: '/api/public/apple-pass/$customerId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/employes': typeof AuthenticatedEmployesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
+  '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -115,6 +123,7 @@ export interface FileRoutesByTo {
   '/employes': typeof AuthenticatedEmployesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
+  '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,6 +140,7 @@ export interface FileRoutesById {
   '/_authenticated/employes': typeof AuthenticatedEmployesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
+  '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/employes'
     | '/onboarding'
     | '/rejoindre/$code'
+    | '/api/public/apple-pass/$customerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/employes'
     | '/onboarding'
     | '/rejoindre/$code'
+    | '/api/public/apple-pass/$customerId'
   id:
     | '__root__'
     | '/'
@@ -176,6 +188,7 @@ export interface FileRouteTypes {
     | '/_authenticated/employes'
     | '/_authenticated/onboarding'
     | '/rejoindre/$code'
+    | '/api/public/apple-pass/$customerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,6 +199,7 @@ export interface RootRouteChildren {
   DpaRoute: typeof DpaRoute
   PrivacyRoute: typeof PrivacyRoute
   RejoindreCodeRoute: typeof RejoindreCodeRoute
+  ApiPublicApplePassCustomerIdRoute: typeof ApiPublicApplePassCustomerIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -281,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RejoindreCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/apple-pass/$customerId': {
+      id: '/api/public/apple-pass/$customerId'
+      path: '/api/public/apple-pass/$customerId'
+      fullPath: '/api/public/apple-pass/$customerId'
+      preLoaderRoute: typeof ApiPublicApplePassCustomerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -313,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   DpaRoute: DpaRoute,
   PrivacyRoute: PrivacyRoute,
   RejoindreCodeRoute: RejoindreCodeRoute,
+  ApiPublicApplePassCustomerIdRoute: ApiPublicApplePassCustomerIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

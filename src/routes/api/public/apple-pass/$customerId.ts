@@ -4,7 +4,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/api/public/apple-pass/$customerId")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         const customerId = String(params.customerId ?? "");
         if (!/^[0-9a-f-]{36}$/i.test(customerId)) {
           return new Response("Client invalide", { status: 400 });
@@ -13,10 +13,7 @@ export const Route = createFileRoute("/api/public/apple-pass/$customerId")({
           const { buildWalletCardInput } = await import("@/lib/wallet-data.server");
           const { buildPkPass } = await import("@/lib/apple-wallet.server");
           const { input } = await buildWalletCardInput(customerId);
-          const origin = new URL(
-            (globalThis as { location?: { origin?: string } }).location?.origin ??
-              "https://fideoloyalty.app",
-          ).origin;
+          const origin = new URL(request.url).origin;
           const pass = await buildPkPass(input, customerId, origin);
           return new Response(pass as unknown as BodyInit, {
             headers: {
