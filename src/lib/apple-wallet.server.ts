@@ -127,7 +127,7 @@ export function buildPassJson(input: WalletCardInput, serialNumber: string, orig
     formatVersion: 1,
     passTypeIdentifier: PASS_TYPE_IDENTIFIER,
     teamIdentifier: APPLE_TEAM_ID,
-    organizationName: APPLE_ORGANIZATION,
+    organizationName: input.issuerName,
     serialNumber,
     description: input.programName,
     logoText: input.issuerName,
