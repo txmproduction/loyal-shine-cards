@@ -122,6 +122,7 @@ export type WalletCardInput = {
   barcodeValue: string;
   locationName?: string | undefined;
   promoMessage?: string | undefined;
+  locations?: Array<{ latitude: number; longitude: number }> | undefined;
 };
 
 function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {
@@ -132,6 +133,14 @@ function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {
     accountName: input.accountName,
     accountId: input.accountId,
     hexBackgroundColor: input.backgroundColor,
+    ...(input.locations?.length
+      ? {
+          locations: input.locations.map((l) => ({
+            latitude: l.latitude,
+            longitude: l.longitude,
+          })),
+        }
+      : {}),
     ...(input.heroImageUrl
       ? {
           heroImage: {
