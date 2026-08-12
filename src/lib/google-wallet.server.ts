@@ -116,6 +116,8 @@ export type WalletCardInput = {
   pointsLabel: string;
   pointsValue: string;
   rewardText: string;
+  progressText?: string | undefined;
+  progressLabel?: string | undefined;
   nextTierText?: string | undefined;
   barcodeValue: string;
   locationName?: string | undefined;
@@ -144,6 +146,15 @@ function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {
       balance: { string: input.pointsValue },
     },
     textModulesData: [
+      ...(input.progressText
+        ? [
+            {
+              header: `Progression ${input.progressLabel ?? ""}`.trim(),
+              body: input.progressText,
+              id: "progression",
+            },
+          ]
+        : []),
       { header: "Titulaire", body: input.accountName, id: "titulaire" },
       {
         header: "Prochain palier",
@@ -151,6 +162,7 @@ function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {
         id: "palier",
       },
       { header: "Récompense", body: input.rewardText, id: "recompense" },
+      { header: "Propulsé par", body: "FIDÉO", id: "fideo" },
     ],
     barcode: { type: "QR_CODE", value: input.barcodeValue, alternateText: "" },
   };
