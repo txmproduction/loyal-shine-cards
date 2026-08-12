@@ -23,6 +23,8 @@ export type WalletCardContext = {
   input: WalletCardInput;
   customerId: string;
   hasWalletPass: boolean;
+  hasApplePass: boolean;
+  hasGooglePass: boolean;
 };
 
 /** Récupère client + commerçant + carte, calcule le solde en direct et construit l'objet Wallet. */
@@ -95,9 +97,18 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
   const reward = card?.valeur_recompense ?? "Récompense offerte";
   const ratio = goal > 0 ? Math.min(1, balance / goal) : 0;
 
+  const { count: appleRegs } = await supabaseAdmin
+    .from("apple_pass_registrations")
+    .select("id", { count: "exact", head: true })
+    .eq("serial_number", customer.id);
+  const hasApplePass = (appleRegs ?? 0) > 0;
+  const hasGooglePass = Boolean(customer.google_wallet_pass_id);
+
   return {
     customerId: customer.id,
-    hasWalletPass: Boolean(customer.google_wallet_pass_id),
+    hasApplePass,
+    hasGooglePass,
+    hasWalletPass: hasGooglePass || hasApplePass,
     input: {
       classSuffix: `fideo_${suffix(customer.establishment_id ?? customer.merchant_id)}`,
       objectSuffix: `fideo_${suffix(customer.id)}`,
