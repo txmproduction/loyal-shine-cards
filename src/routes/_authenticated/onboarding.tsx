@@ -148,6 +148,12 @@ function OnboardingWizard() {
         .from("establishments")
         .update({ nom: nomEtab || establishment.nom, adresse: adresse || null })
         .eq("id", establishment.id);
+      if (adresse) {
+        const { geocoderEtablissement } = await import("@/lib/geocode.functions");
+        void geocoderEtablissement({ data: { establishment_id: establishment.id } }).catch(
+          () => undefined,
+        );
+      }
     }
 
     let e2 = null;
