@@ -356,15 +356,16 @@ function CardSettings() {
           <div className="animate-rise rounded-2xl border border-dashed border-border bg-card p-5 text-sm shadow-soft">
             <h2 className="text-base font-bold">Wallet</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              La génération des pass sera activée dès que la licence Apple Developer sera disponible.
-              La structure est déjà prête en base.
+              Vos clients peuvent ajouter leur carte de fidélité directement dans Apple Wallet et
+              Google Wallet. Le solde de points se met à jour automatiquement sur leur téléphone à
+              chaque passage.
             </p>
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1">
-                <Apple className="h-3 w-3" /> Apple Wallet — bientôt
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
+                <Apple className="h-3 w-3" /> Apple Wallet — disponible
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1">
-                <Smartphone className="h-3 w-3" /> Google Wallet — bientôt
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
+                <Smartphone className="h-3 w-3" /> Google Wallet — disponible
               </span>
             </div>
           </div>

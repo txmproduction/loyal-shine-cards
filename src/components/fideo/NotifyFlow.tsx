@@ -108,10 +108,9 @@ export function NotifyFlow({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Pas si vite !</DialogTitle>
+            <DialogTitle>Bientôt disponible</DialogTitle>
             <DialogDescription>
-              Les notifications Push illimitées sont en cours de programmation. Encore un peu de
-              patience 🙂
+              L'envoi de notifications push à vos clients sera activé très prochainement.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
