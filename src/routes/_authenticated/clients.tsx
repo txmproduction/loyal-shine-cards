@@ -1,5 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getWalletStatuses } from "@/lib/wallet.functions";
 import { Apple, Gift, QrCode, ScanLine, Search, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -62,6 +65,21 @@ function ClientsPage() {
   const { data: rewards } = useRewards(ids);
   const addPoint = useAddPoint();
   const redeem = useRedeemReward();
+
+  const fetchWalletStatuses = useServerFn(getWalletStatuses);
+  const { data: walletStatuses } = useQuery({
+    queryKey: ["wallet-statuses", ids.length, ids[0] ?? ""],
+    enabled: ids.length > 0,
+    queryFn: () => fetchWalletStatuses({ data: { customer_ids: ids } }),
+  });
+  const appleActive = useMemo(
+    () => new Set(walletStatuses?.apple ?? []),
+    [walletStatuses],
+  );
+  const googleActive = useMemo(
+    () => new Set(walletStatuses?.google ?? []),
+    [walletStatuses],
+  );
 
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState<string | null>(null);
@@ -221,11 +239,11 @@ function ClientsPage() {
                   <div className="mb-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
                     <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1">
                       <Apple className="h-3 w-3" />
-                      {customer.apple_wallet_pass_id ?? "Apple Wallet — non généré"}
+                      {appleActive.has(customer.id) ? "Apple Wallet — actif" : "Apple Wallet — non généré"}
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1">
                       <Smartphone className="h-3 w-3" />
-                      {customer.google_wallet_pass_id ?? "Google Wallet — non généré"}
+                      {googleActive.has(customer.id) ? "Google Wallet — actif" : "Google Wallet — non généré"}
                     </span>
                   </div>
                   <ol className="space-y-1.5">
