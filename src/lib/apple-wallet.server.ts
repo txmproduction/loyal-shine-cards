@@ -135,6 +135,16 @@ export function buildPassJson(input: WalletCardInput, serialNumber: string, orig
     foregroundColor: "rgb(255,255,255)",
     labelColor: "rgba(255,255,255,0.75)",
     sharingProhibited: false,
+    ...(input.locations?.length
+      ? {
+          locations: input.locations.slice(0, 10).map((l) => ({
+            latitude: l.latitude,
+            longitude: l.longitude,
+            relevantText: `À proximité de ${input.issuerName} — présentez votre carte !`,
+          })),
+          maxDistance: 150,
+        }
+      : {}),
     webServiceURL: `${origin}/api/public/passes/`,
     authenticationToken: passAuthToken(serialNumber),
     barcodes: [barcode],
