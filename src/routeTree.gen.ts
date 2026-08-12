@@ -23,6 +23,7 @@ import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
 import { Route as ApiPublicApplePassCustomerIdRouteImport } from './routes/api/public/apple-pass/$customerId'
+import { Route as ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteImport } from './routes/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId'
 import { Route as ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRouteImport } from './routes/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial'
 
 const IndexRoute = IndexRouteImport.update({
@@ -95,12 +96,19 @@ const ApiPublicApplePassCustomerIdRoute =
     path: '/api/public/apple-pass/$customerId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRoute =
+  ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteImport.update({
+    id: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId',
+    path: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute =
   ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRouteImport.update(
     {
-      id: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial',
-      path: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial',
-      getParentRoute: () => rootRouteImport,
+      id: '/$serial',
+      path: '/$serial',
+      getParentRoute: () =>
+        ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRoute,
     } as any,
   )
 
@@ -118,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
+  '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId': typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteWithChildren
   '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial': typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute
 }
 export interface FileRoutesByTo {
@@ -134,6 +143,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
+  '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId': typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteWithChildren
   '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial': typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute
 }
 export interface FileRoutesById {
@@ -152,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
+  '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId': typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteWithChildren
   '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial': typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/rejoindre/$code'
     | '/api/public/apple-pass/$customerId'
+    | '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId'
     | '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -186,6 +198,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/rejoindre/$code'
     | '/api/public/apple-pass/$customerId'
+    | '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId'
     | '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial'
   id:
     | '__root__'
@@ -203,6 +216,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/rejoindre/$code'
     | '/api/public/apple-pass/$customerId'
+    | '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId'
     | '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial'
   fileRoutesById: FileRoutesById
 }
@@ -215,7 +229,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RejoindreCodeRoute: typeof RejoindreCodeRoute
   ApiPublicApplePassCustomerIdRoute: typeof ApiPublicApplePassCustomerIdRoute
-  ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute: typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute
+  ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRoute: typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -318,12 +332,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicApplePassCustomerIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId': {
+      id: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId'
+      path: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId'
+      fullPath: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId'
+      preLoaderRoute: typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial': {
       id: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial'
-      path: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial'
+      path: '/$serial'
       fullPath: '/api/public/passes/v1/devices/$deviceId/registrations/$passTypeId/$serial'
       preLoaderRoute: typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRoute
     }
   }
 }
@@ -349,6 +370,21 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteChildren {
+  ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute: typeof ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute
+}
+
+const ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteChildren: ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteChildren =
+  {
+    ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute:
+      ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute,
+  }
+
+const ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteWithChildren =
+  ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRoute._addFileChildren(
+    ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -358,8 +394,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RejoindreCodeRoute: RejoindreCodeRoute,
   ApiPublicApplePassCustomerIdRoute: ApiPublicApplePassCustomerIdRoute,
-  ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute:
-    ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdSerialRoute,
+  ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRoute:
+    ApiPublicPassesV1DevicesDeviceIdRegistrationsPassTypeIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
