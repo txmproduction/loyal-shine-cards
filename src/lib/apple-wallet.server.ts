@@ -44,15 +44,15 @@ function loadSigner(): Signer {
   const p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, password);
 
   const keyBags = {
-    ...p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag }),
-    ...p12.getBags({ bagType: forge.pki.oids.keyBag }),
+    ...p12.getBags({ bagType: forge.pki.oids['pkcs8ShroudedKeyBag']! }),
+    ...p12.getBags({ bagType: forge.pki.oids['keyBag']! }),
   } as Record<string, forge.pkcs12.Bag[] | undefined>;
   const key = Object.values(keyBags)
     .flatMap((bags) => bags ?? [])
     .map((bag) => bag.key)
     .find(Boolean);
   const certificate = Object.values(
-    p12.getBags({ bagType: forge.pki.oids.certBag }) as Record<string, forge.pkcs12.Bag[]>,
+    p12.getBags({ bagType: forge.pki.oids['certBag']! }) as Record<string, forge.pkcs12.Bag[]>,
   )
     .flatMap((bags) => bags ?? [])
     .map((bag) => bag.cert)
