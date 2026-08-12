@@ -187,8 +187,14 @@ function JoinPage() {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Button variant="secondary" disabled className="justify-center">
-              <Apple className="mr-2 h-4 w-4" /> Ajouter à Apple Wallet — bientôt
+            <Button
+              variant="secondary"
+              className="justify-center"
+              onClick={() => {
+                window.location.href = `/api/public/apple-pass/${customerId}`;
+              }}
+            >
+              <Apple className="mr-2 h-4 w-4" /> Ajouter à Apple Wallet
             </Button>
             <Button
               variant="secondary"
@@ -201,8 +207,7 @@ function JoinPage() {
             </Button>
             {walletError && <p className="text-xs text-destructive">{walletError}</p>}
             <p className="text-xs text-muted-foreground">
-              En attendant, faites une capture d'écran de ce QR code et présentez-le à chaque
-              passage.
+              Votre carte se met à jour automatiquement dans votre wallet à chaque passage.
             </p>
           </div>
         </div>
