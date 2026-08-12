@@ -251,6 +251,8 @@ export type Database = {
           email: string
           id: string
           logo_url: string | null
+          message_promo: string | null
+          message_promo_date: string | null
           nom_commerce: string
           onboarding_completed: boolean
           partage_mode: string | null
@@ -268,6 +270,8 @@ export type Database = {
           email: string
           id?: string
           logo_url?: string | null
+          message_promo?: string | null
+          message_promo_date?: string | null
           nom_commerce: string
           onboarding_completed?: boolean
           partage_mode?: string | null
@@ -285,6 +289,8 @@ export type Database = {
           email?: string
           id?: string
           logo_url?: string | null
+          message_promo?: string | null
+          message_promo_date?: string | null
           nom_commerce?: string
           onboarding_completed?: boolean
           partage_mode?: string | null
