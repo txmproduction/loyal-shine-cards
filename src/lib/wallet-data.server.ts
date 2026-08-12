@@ -86,13 +86,30 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
   const balance = Math.max(0, earned - (redeemed ?? 0) * goal);
 
   let establishmentName: string | undefined;
-  if (customer.establishment_id) {
-    const { data: est } = await supabaseAdmin
-      .from("establishments")
-      .select("nom")
-      .eq("id", customer.establishment_id)
-      .maybeSingle();
-    establishmentName = est?.nom ?? undefined;
+  // Points de proximité : établissement du client sinon tous ceux du commerçant (max 10).
+  const { data: establishments } = await supabaseAdmin
+    .from("establishments")
+    .select("id, nom, adresse, latitude, longitude")
+    .eq("merchant_id", customer.merchant_id)
+    .limit(10);
+  const list = establishments ?? [];
+  const own = customer.establishment_id
+    ? list.find((e) => e.id === customer.establishment_id)
+    : undefined;
+  establishmentName = own?.nom ?? undefined;
+
+  const relevant = own ? [own] : list;
+  const locations: Array<{ latitude: number; longitude: number }> = [];
+  for (const est of relevant) {
+    if (typeof est.latitude === "number" && typeof est.longitude === "number") {
+      locations.push({ latitude: est.latitude, longitude: est.longitude });
+      continue;
+    }
+    if (!est.adresse) continue;
+    // Fallback : géocode à la volée puis stocke pour ne pas refaire l'appel.
+    const { geocodeAndStoreEstablishment } = await import("@/lib/geocode.server");
+    const point = await geocodeAndStoreEstablishment(est.id);
+    if (point) locations.push(point);
   }
 
   const fullName = [customer.prenom, customer.nom].filter(Boolean).join(" ") || "Client";
@@ -138,6 +155,7 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
       barcodeValue: customer.id,
       locationName: establishmentName,
       promoMessage: merchant.message_promo?.trim() || undefined,
+      locations: locations.length ? locations.slice(0, 10) : undefined,
     },
   };
 }
