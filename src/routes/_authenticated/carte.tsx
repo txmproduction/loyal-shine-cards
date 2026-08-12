@@ -171,6 +171,7 @@ function CardSettings() {
           <div className="space-y-2">
             <Label>Nom du commerce</Label>
             <Input value={nomCommerce} onChange={(e) => setNomCommerce(e.target.value)} />
+            <NameSpacingHint value={nomCommerce} onFix={setNomCommerce} />
           </div>
 
           <div className="space-y-2">
