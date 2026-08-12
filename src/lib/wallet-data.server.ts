@@ -111,12 +111,14 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
       accountName: fullName,
       accountId: customer.id,
       pointsLabel: amountMode ? "Points" : "Étoiles",
-      pointsValue: amountMode
-        ? `${balance.toFixed(2)} € / ${goal.toFixed(2)} €`
-        : `${balance} / ${goal}`,
+      pointsValue: amountMode ? `${balance.toFixed(0)} €` : `${balance}`,
       rewardText: reward,
-      progressText: progressBar(ratio),
-      progressLabel: `${Math.round(ratio * 100)} %`,
+      progressText: amountMode
+        ? `${balance.toFixed(0)} € / ${goal.toFixed(0)} €`
+        : stampBar(balance, goal),
+      progressLabel: amountMode
+        ? `${Math.round(ratio * 100)} %`
+        : `${balance}/${goal}`,
       nextTierText: amountMode
         ? `${goal.toFixed(2)} € dépensés → ${reward}`
         : `${goal} étoiles → ${reward}`,
