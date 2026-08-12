@@ -155,13 +155,12 @@ function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {
             },
           ]
         : []),
-      { header: "Titulaire", body: input.accountName, id: "titulaire" },
       {
         header: "Prochain palier",
         body: input.nextTierText ?? input.rewardText,
         id: "palier",
       },
-      { header: "Récompense", body: input.rewardText, id: "recompense" },
+      { header: "Titulaire", body: input.accountName, id: "titulaire" },
       { header: "Propulsé par", body: "FIDÉO", id: "fideo" },
     ],
     barcode: { type: "QR_CODE", value: input.barcodeValue, alternateText: "" },
