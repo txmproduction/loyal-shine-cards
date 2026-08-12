@@ -103,7 +103,12 @@ async function fetchPng(url: string | undefined): Promise<Uint8Array | null> {
     const bytes = new Uint8Array(await res.arrayBuffer());
     const isPng =
       bytes.length > 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e;
-    return isPng ? bytes : null;
+    if (isPng) return bytes;
+    // Cloudinary : on redemande la même image convertie en PNG.
+    if (url.includes("/image/upload/") && !url.includes("/f_png/")) {
+      return fetchPng(url.replace("/image/upload/", "/image/upload/f_png/"));
+    }
+    return null;
   } catch {
     return null;
   }
@@ -148,30 +153,32 @@ export function buildPassJson(input: WalletCardInput, serialNumber: string, orig
       primaryFields: [
         {
           key: "progress",
-          label: `${input.pointsLabel} · ${input.progressLabel ?? ""}`.trim(),
+          label: input.progressLabel ?? input.pointsLabel,
           value: input.progressText ?? input.pointsValue,
         },
       ],
       secondaryFields: [
-        { key: "reward", label: "Récompense", value: input.rewardText },
+        {
+          key: "tier",
+          label: "Prochain palier",
+          value: input.nextTierText ?? input.rewardText,
+        },
         ...(input.locationName
-          ? [{ key: "place", label: "Établissement", value: input.locationName }]
+          ? [{ key: "place", label: "Lieu", value: input.locationName }]
           : []),
       ],
       auxiliaryFields: [
         { key: "member", label: "Titulaire", value: input.accountName },
         {
           key: "brand",
-          label: "Propulsé par",
+          label: " ",
           value: "FIDÉO",
           textAlignment: "PKTextAlignmentRight",
         },
       ],
       backFields: [
         { key: "program", label: "Programme", value: input.programName },
-        ...(input.nextTierText
-          ? [{ key: "tier", label: "Prochain palier", value: input.nextTierText }]
-          : []),
+        { key: "reward", label: "Récompense", value: input.rewardText },
         { key: "card", label: "Numéro de carte", value: input.accountId },
         {
           key: "info",
