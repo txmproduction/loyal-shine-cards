@@ -191,18 +191,28 @@ export async function buildPkPass(
   serialNumber: string,
   origin: string,
 ): Promise<Uint8Array> {
-  const icon =
-    (await fetchPng(input.logoUrl)) ?? binaryToBytes(forge.util.decode64(DEFAULT_PASS_ICON_BASE64));
-  const strip = await fetchPng(input.heroImageUrl);
+  const brand = (await fetchBitmap(input.logoUrl)) ?? (await defaultIconBitmap());
+  const hero = await fetchBitmap(input.heroImageUrl);
 
   const files: Record<string, Uint8Array> = {
     "pass.json": strToU8(JSON.stringify(buildPassJson(input, serialNumber, origin))),
-    "icon.png": icon,
-    "icon@2x.png": icon,
-    "logo.png": icon,
-    "logo@2x.png": icon,
-    ...(strip ? { "strip.png": strip, "strip@2x.png": strip } : {}),
   };
+
+  if (brand) {
+    // icon : carré, contain sur fond transparent.
+    files["icon.png"] = encodePng(resizeContain(brand, 29, 29));
+    files["icon@2x.png"] = encodePng(resizeContain(brand, 58, 58));
+    files["icon@3x.png"] = encodePng(resizeContain(brand, 87, 87));
+    // logo : bandeau haut-gauche, ratio préservé.
+    files["logo.png"] = encodePng(resizeContain(brand, 160, 50));
+    files["logo@2x.png"] = encodePng(resizeContain(brand, 320, 100));
+  }
+  if (hero) {
+    // strip : photo du commerçant en fond, recadrage centré.
+    files["strip.png"] = encodePng(resizeCover(hero, 375, 144));
+    files["strip@2x.png"] = encodePng(resizeCover(hero, 750, 288));
+    files["strip@3x.png"] = encodePng(resizeCover(hero, 1125, 432));
+  }
 
   const manifest: Record<string, string> = {};
   for (const [name, bytes] of Object.entries(files)) manifest[name] = sha1Hex(bytes);
