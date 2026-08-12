@@ -6,6 +6,18 @@ const DEFAULT_LOGO =
 
 export const suffix = (value: string) => value.replace(/[^A-Za-z0-9_.-]/g, "_");
 
+/** Tronque proprement un nom trop long pour l'en-tête d'une carte Wallet. */
+function shortName(name: string, max = 22): string {
+  const clean = name.trim().replace(/\s+/g, " ");
+  return clean.length <= max ? clean : `${clean.slice(0, max - 1).trimEnd()}…`;
+}
+
+/** Barre de progression textuelle (Wallet n'autorise pas de vrai composant graphique). */
+function progressBar(ratio: number, segments = 10): string {
+  const filled = Math.max(0, Math.min(segments, Math.round(ratio * segments)));
+  return `${"■".repeat(filled)}${"□".repeat(segments - filled)}`;
+}
+
 export type WalletCardContext = {
   input: WalletCardInput;
   customerId: string;
@@ -80,6 +92,7 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
 
   const fullName = [customer.prenom, customer.nom].filter(Boolean).join(" ") || "Client";
   const reward = card?.valeur_recompense ?? "Récompense offerte";
+  const ratio = goal > 0 ? Math.min(1, balance / goal) : 0;
 
   return {
     customerId: customer.id,
@@ -87,8 +100,8 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
     input: {
       classSuffix: `fideo_${suffix(customer.establishment_id ?? customer.merchant_id)}`,
       objectSuffix: `fideo_${suffix(customer.id)}`,
-      programName: `Carte de fidélité ${merchant.nom_commerce}`,
-      issuerName: merchant.nom_commerce,
+      programName: `Carte de fidélité ${shortName(merchant.nom_commerce, 30)}`,
+      issuerName: shortName(merchant.nom_commerce),
       logoUrl: merchant.logo_url ?? DEFAULT_LOGO,
       heroImageUrl: merchant.photo_url ?? undefined,
       backgroundColor: /^#[0-9a-f]{6}$/i.test(merchant.couleur_marque ?? "")
@@ -101,6 +114,8 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
         ? `${balance.toFixed(2)} € / ${goal.toFixed(2)} €`
         : `${balance} / ${goal}`,
       rewardText: reward,
+      progressText: progressBar(ratio),
+      progressLabel: `${Math.round(ratio * 100)} %`,
       nextTierText: amountMode
         ? `${goal.toFixed(2)} € dépensés → ${reward}`
         : `${goal} étoiles → ${reward}`,
