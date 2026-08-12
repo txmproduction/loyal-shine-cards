@@ -33,10 +33,23 @@ export const refreshWalletCard = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { buildWalletCardInput } = await import("@/lib/wallet-data.server");
     const { updateWalletObject } = await import("@/lib/google-wallet.server");
+    const { pushApplePassUpdate } = await import("@/lib/apns.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { input, hasWalletPass } = await buildWalletCardInput(data.customer_id);
-    if (!hasWalletPass) return { updated: false };
 
-    await updateWalletObject(input);
-    return { updated: true };
+    if (hasWalletPass) {
+      await updateWalletObject(input).catch((e) =>
+        console.error("[Wallet] Google update failed", e),
+      );
+    }
+
+    // Apple Wallet : marque le pass comme modifié puis notifie les appareils enregistrés.
+    await supabaseAdmin
+      .from("apple_pass_registrations")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("serial_number", data.customer_id);
+    const pushed = await pushApplePassUpdate(data.customer_id).catch(() => 0);
+
+    return { updated: hasWalletPass, applePushed: pushed };
   });

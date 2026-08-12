@@ -38,6 +38,36 @@ export type Database = {
         }
         Relationships: []
       }
+      apple_pass_registrations: {
+        Row: {
+          created_at: string
+          device_library_identifier: string
+          id: string
+          pass_type_identifier: string
+          push_token: string
+          serial_number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          device_library_identifier: string
+          id?: string
+          pass_type_identifier: string
+          push_token: string
+          serial_number: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          device_library_identifier?: string
+          id?: string
+          pass_type_identifier?: string
+          push_token?: string
+          serial_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           apple_wallet_pass_id: string | null
