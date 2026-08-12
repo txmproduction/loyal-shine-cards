@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLoyaltyCard, useMerchant } from "@/lib/fideo";
 import { CARD_PALETTE, uploadImage } from "@/lib/upload";
 import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
+import { NameSpacingHint } from "@/components/fideo/NameSpacingHint";
 import { EstablishmentsSection } from "@/components/fideo/EstablishmentsSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
