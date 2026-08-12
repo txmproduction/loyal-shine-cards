@@ -8,23 +8,28 @@ export const Route = createFileRoute(
     handlers: {
       GET: async ({ params, request }) => {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const since = new URL(request.url).searchParams.get("passesUpdatedSince");
+        const sinceRaw = new URL(request.url).searchParams.get("passesUpdatedSince");
+        // URLSearchParams décode le "+" de "+00:00" comme un espace. Sans
+        // normalisation, Date.parse retourne NaN et aucun pass ne paraît modifié.
+        const sinceNormalized = sinceRaw?.replace(
+          /(T\d{2}:\d{2}:\d{2}(?:\.\d+)?) (\d{2}:\d{2})$/,
+          "$1+$2",
+        );
+        const parsedSince = sinceNormalized ? Date.parse(sinceNormalized) : undefined;
+        const sinceTimestamp =
+          parsedSince !== undefined && Number.isFinite(parsedSince) ? parsedSince : undefined;
 
         const { data } = await supabaseAdmin
           .from("apple_pass_registrations")
-          .select("serial_number, updated_at")
+          .select("serial_number")
           .eq("device_library_identifier", String(params.deviceId))
           .eq("pass_type_identifier", String(params.passTypeId));
         if (!data?.length) return new Response(null, { status: 204 });
 
         const serials = [...new Set(data.map((r) => r.serial_number))];
 
-        // Vraie date de modification du contenu : dernier point / dernière récompense
-        const latest = new Map<string, string>();
-        for (const row of data) {
-          const prev = latest.get(row.serial_number);
-          if (!prev || row.updated_at > prev) latest.set(row.serial_number, row.updated_at);
-        }
+        // Source de vérité exclusive : dernier point / dernière récompense.
+        const latest = new Map<string, number>();
 
         const [points, rewards] = await Promise.all([
           supabaseAdmin
@@ -40,20 +45,45 @@ export const Route = createFileRoute(
         ]);
 
         for (const row of [...(points.data ?? []), ...(rewards.data ?? [])]) {
+          const timestamp = Date.parse(row.date);
+          if (!Number.isFinite(timestamp)) continue;
           const prev = latest.get(row.customer_id);
-          if (!prev || row.date > prev) latest.set(row.customer_id, row.date);
+          if (prev === undefined || timestamp > prev) latest.set(row.customer_id, timestamp);
         }
 
-        const kept = serials.filter((s) => {
-          const d = latest.get(s);
-          if (!d) return false;
-          return since ? new Date(d).getTime() > new Date(since).getTime() : true;
-        });
+        const kept = sinceRaw
+          ? serials.filter((serial) => {
+              const modifiedAt = latest.get(serial);
+              // Une date Apple illisible ne doit jamais masquer une mise à jour.
+              return sinceTimestamp === undefined ||
+                (modifiedAt !== undefined && modifiedAt > sinceTimestamp);
+            })
+          : serials;
+
+        console.log(
+          "[Apple Poll]",
+          "sinceRaw",
+          sinceRaw,
+          "sinceUtc",
+          sinceTimestamp === undefined ? "invalid/none" : new Date(sinceTimestamp).toISOString(),
+          "latest",
+          Object.fromEntries(
+            serials.map((serial) => {
+              const timestamp = latest.get(serial);
+              return [serial, timestamp === undefined ? null : new Date(timestamp).toISOString()];
+            }),
+          ),
+          "serialsReturned",
+          kept,
+        );
 
         if (!kept.length) return new Response(null, { status: 204 });
 
+        const modificationTimes = kept
+          .map((serial) => latest.get(serial))
+          .filter((timestamp): timestamp is number => timestamp !== undefined);
         const lastUpdated = new Date(
-          Math.max(...kept.map((s) => new Date(latest.get(s)!).getTime())),
+          modificationTimes.length ? Math.max(...modificationTimes) : Date.now(),
         ).toISOString();
 
         return Response.json({
