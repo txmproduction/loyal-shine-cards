@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const validateCustomerId = (input: { customer_id: string }) => {
   const id = String(input?.customer_id ?? "").trim();
@@ -36,9 +37,9 @@ export const refreshWalletCard = createServerFn({ method: "POST" })
     const { pushApplePassUpdate } = await import("@/lib/apns.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { input, hasWalletPass } = await buildWalletCardInput(data.customer_id);
+    const { input, hasGooglePass } = await buildWalletCardInput(data.customer_id);
 
-    if (hasWalletPass) {
+    if (hasGooglePass) {
       await updateWalletObject(input).catch((e) =>
         console.error("[Wallet] Google update failed", e),
       );
@@ -51,5 +52,37 @@ export const refreshWalletCard = createServerFn({ method: "POST" })
       .eq("serial_number", data.customer_id);
     const pushed = await pushApplePassUpdate(data.customer_id).catch(() => 0);
 
-    return { updated: hasWalletPass, applePushed: pushed };
+    return { updated: hasGooglePass, applePushed: pushed };
+  });
+
+/** Renvoie, pour une liste de clients, ceux qui ont un pass Apple et/ou Google actif. */
+export const getWalletStatuses = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { customer_ids: string[] }) => ({
+    customer_ids: (input?.customer_ids ?? [])
+      .map((id) => String(id).trim())
+      .filter((id) => /^[0-9a-f-]{36}$/i.test(id))
+      .slice(0, 500),
+  }))
+  .handler(async ({ data, context }) => {
+    if (data.customer_ids.length === 0) return { apple: [], google: [] };
+
+    // RLS : ne garde que les clients visibles par l'appelant.
+    const { data: allowed } = await context.supabase
+      .from("customers")
+      .select("id, google_wallet_pass_id")
+      .in("id", data.customer_ids);
+    const ids = (allowed ?? []).map((c) => c.id);
+    if (ids.length === 0) return { apple: [], google: [] };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: regs } = await supabaseAdmin
+      .from("apple_pass_registrations")
+      .select("serial_number")
+      .in("serial_number", ids);
+
+    return {
+      apple: Array.from(new Set((regs ?? []).map((r) => r.serial_number))),
+      google: (allowed ?? []).filter((c) => c.google_wallet_pass_id).map((c) => c.id),
+    };
   });
