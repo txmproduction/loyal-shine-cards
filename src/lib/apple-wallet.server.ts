@@ -146,19 +146,32 @@ export function buildPassJson(input: WalletCardInput, serialNumber: string, orig
         { key: "points", label: input.pointsLabel, value: input.pointsValue },
       ],
       primaryFields: [
-        { key: "reward", label: "Récompense", value: input.rewardText },
+        {
+          key: "progress",
+          label: `${input.pointsLabel} · ${input.progressLabel ?? ""}`.trim(),
+          value: input.progressText ?? input.pointsValue,
+        },
       ],
       secondaryFields: [
-        { key: "member", label: "Titulaire", value: input.accountName },
+        { key: "reward", label: "Récompense", value: input.rewardText },
         ...(input.locationName
           ? [{ key: "place", label: "Établissement", value: input.locationName }]
           : []),
       ],
-      auxiliaryFields: input.nextTierText
-        ? [{ key: "tier", label: "Prochain palier", value: input.nextTierText }]
-        : [],
+      auxiliaryFields: [
+        { key: "member", label: "Titulaire", value: input.accountName },
+        {
+          key: "brand",
+          label: "Propulsé par",
+          value: "FIDÉO",
+          textAlignment: "PKTextAlignmentRight",
+        },
+      ],
       backFields: [
         { key: "program", label: "Programme", value: input.programName },
+        ...(input.nextTierText
+          ? [{ key: "tier", label: "Prochain palier", value: input.nextTierText }]
+          : []),
         { key: "card", label: "Numéro de carte", value: input.accountId },
         {
           key: "info",
