@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEstablishments, useLoyaltyCard, useMerchant } from "@/lib/fideo";
 import { CARD_PALETTE, SECTEURS, uploadImage } from "@/lib/upload";
 import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
+import { NameSpacingHint } from "@/components/fideo/NameSpacingHint";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -216,6 +217,7 @@ function OnboardingWizard() {
               <div className="space-y-2">
                 <Label htmlFor="etab">Nom de l'établissement</Label>
                 <Input id="etab" value={nomEtab} onChange={(e) => setNomEtab(e.target.value)} />
+                <NameSpacingHint value={nomEtab} onFix={setNomEtab} />
               </div>
               <div className="space-y-2">
                 <Label>Secteur d'activité</Label>

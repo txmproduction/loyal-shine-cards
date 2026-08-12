@@ -4,6 +4,14 @@ import { zipSync, strToU8 } from "fflate";
 import { APPLE_WWDR_G4_PEM } from "./apple-wwdr.server";
 import { DEFAULT_PASS_ICON_BASE64 } from "./apple-pass-icon.server";
 import type { WalletCardInput } from "./google-wallet.server";
+import {
+  decodeImage,
+  encodePng,
+  fetchBitmap,
+  resizeContain,
+  resizeCover,
+  type Bitmap,
+} from "./image.server";
 
 export const PASS_TYPE_IDENTIFIER = "pass.app.fideoloyalty.card";
 export const APPLE_TEAM_ID = "QBR5LW4N8A";
@@ -94,24 +102,9 @@ function sha1Hex(bytes: Uint8Array): string {
   return md.digest().toHex();
 }
 
-/** Télécharge une image distante uniquement si c'est bien un PNG (contrainte Apple). */
-async function fetchPng(url: string | undefined): Promise<Uint8Array | null> {
-  if (!url) return null;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    const isPng =
-      bytes.length > 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e;
-    if (isPng) return bytes;
-    // Cloudinary : on redemande la même image convertie en PNG.
-    if (url.includes("/image/upload/") && !url.includes("/f_png/")) {
-      return fetchPng(url.replace("/image/upload/", "/image/upload/f_png/"));
-    }
-    return null;
-  } catch {
-    return null;
-  }
+/** Images du pass : Apple exige du PNG aux dimensions exactes, on transcode donc tout. */
+async function defaultIconBitmap(): Promise<Bitmap | null> {
+  return decodeImage(binaryToBytes(forge.util.decode64(DEFAULT_PASS_ICON_BASE64)));
 }
 
 /** Jeton d'authentification du pass (web service Apple), dérivé du numéro de série. */
@@ -124,6 +117,12 @@ export function passAuthToken(serialNumber: string): string {
 }
 
 export function buildPassJson(input: WalletCardInput, serialNumber: string, origin: string) {
+  const barcode = {
+    format: "PKBarcodeFormatQR",
+    message: input.barcodeValue,
+    messageEncoding: "iso-8859-1",
+    altText: input.accountName,
+  };
   return {
     formatVersion: 1,
     passTypeIdentifier: PASS_TYPE_IDENTIFIER,
@@ -138,14 +137,9 @@ export function buildPassJson(input: WalletCardInput, serialNumber: string, orig
     sharingProhibited: false,
     webServiceURL: `${origin}/api/public/passes/`,
     authenticationToken: passAuthToken(serialNumber),
-    barcodes: [
-      {
-        format: "PKBARCODE_FORMAT_QR",
-        message: input.barcodeValue,
-        messageEncoding: "iso-8859-1",
-        altText: input.accountName,
-      },
-    ],
+    barcodes: [barcode],
+    // Champ legacy conservé pour les anciennes versions d'iOS.
+    barcode,
     storeCard: {
       headerFields: [
         { key: "points", label: input.pointsLabel, value: input.pointsValue },
@@ -197,18 +191,28 @@ export async function buildPkPass(
   serialNumber: string,
   origin: string,
 ): Promise<Uint8Array> {
-  const icon =
-    (await fetchPng(input.logoUrl)) ?? binaryToBytes(forge.util.decode64(DEFAULT_PASS_ICON_BASE64));
-  const strip = await fetchPng(input.heroImageUrl);
+  const brand = (await fetchBitmap(input.logoUrl)) ?? (await defaultIconBitmap());
+  const hero = await fetchBitmap(input.heroImageUrl);
 
   const files: Record<string, Uint8Array> = {
     "pass.json": strToU8(JSON.stringify(buildPassJson(input, serialNumber, origin))),
-    "icon.png": icon,
-    "icon@2x.png": icon,
-    "logo.png": icon,
-    "logo@2x.png": icon,
-    ...(strip ? { "strip.png": strip, "strip@2x.png": strip } : {}),
   };
+
+  if (brand) {
+    // icon : carré, contain sur fond transparent.
+    files["icon.png"] = encodePng(resizeContain(brand, 29, 29));
+    files["icon@2x.png"] = encodePng(resizeContain(brand, 58, 58));
+    files["icon@3x.png"] = encodePng(resizeContain(brand, 87, 87));
+    // logo : bandeau haut-gauche, ratio préservé.
+    files["logo.png"] = encodePng(resizeContain(brand, 160, 50));
+    files["logo@2x.png"] = encodePng(resizeContain(brand, 320, 100));
+  }
+  if (hero) {
+    // strip : photo du commerçant en fond, recadrage centré.
+    files["strip.png"] = encodePng(resizeCover(hero, 375, 144));
+    files["strip@2x.png"] = encodePng(resizeCover(hero, 750, 288));
+    files["strip@3x.png"] = encodePng(resizeCover(hero, 1125, 432));
+  }
 
   const manifest: Record<string, string> = {};
   for (const [name, bytes] of Object.entries(files)) manifest[name] = sha1Hex(bytes);
