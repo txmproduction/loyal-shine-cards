@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Bell, ChevronLeft, Send } from "lucide-react";
+import { Bell, ChevronLeft, Loader2, Send } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { envoyerNotificationPromo } from "@/lib/notifications.functions";
 
 const MAX = 150;
 
@@ -24,11 +27,35 @@ export function NotifyFlow({
 }) {
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [message, setMessage] = useState("");
-  const [done, setDone] = useState(false);
+  const [sending, setSending] = useState(false);
+  const send = useServerFn(envoyerNotificationPromo);
 
   const close = () => {
     setStep(0);
     setMessage("");
+  };
+
+  const submit = async () => {
+    setSending(true);
+    try {
+      const res = await send({ data: { message: message.trim() } });
+      const touched = res.apple + res.google;
+      toast.success(
+        touched > 0
+          ? `Notification envoyée à ${touched} client${touched > 1 ? "s" : ""}`
+          : "Aucun client wallet-actif à notifier",
+        {
+          description: `Apple Wallet : ${res.apple} · Google Wallet : ${res.google}`,
+        },
+      );
+      close();
+    } catch (e) {
+      toast.error("Envoi impossible", {
+        description: e instanceof Error ? e.message : "Veuillez réessayer.",
+      });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -76,7 +103,7 @@ export function NotifyFlow({
       </Dialog>
 
       {/* Écran 3 — Aperçu */}
-      <Dialog open={step === 2} onOpenChange={(o) => !o && close()}>
+      <Dialog open={step === 2} onOpenChange={(o) => !o && !sending && close()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Aperçu de la notification</DialogTitle>
@@ -86,41 +113,16 @@ export function NotifyFlow({
           <PhoneMockup nomCommerce={nomCommerce} iconUrl={iconUrl} message={message} />
 
           <DialogFooter className="gap-2 sm:justify-between">
-            <Button variant="ghost" onClick={() => setStep(1)}>
+            <Button variant="ghost" disabled={sending} onClick={() => setStep(1)}>
               <ChevronLeft className="mr-1 h-4 w-4" /> Modifier
             </Button>
-            <Button size="lg" onClick={() => setDone(true)}>
-              <Send className="mr-2 h-4 w-4" /> Envoyer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Placeholder */}
-      <Dialog
-        open={done}
-        onOpenChange={(o) => {
-          if (!o) {
-            setDone(false);
-            close();
-          }
-        }}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Bientôt disponible</DialogTitle>
-            <DialogDescription>
-              L'envoi de notifications push à vos clients sera activé très prochainement.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              onClick={() => {
-                setDone(false);
-                close();
-              }}
-            >
-              Compris
+            <Button size="lg" disabled={sending} onClick={() => void submit()}>
+              {sending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
+              {sending ? "Envoi…" : "Envoyer"}
             </Button>
           </DialogFooter>
         </DialogContent>
