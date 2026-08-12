@@ -185,7 +185,7 @@ function ClientsPage() {
         </Button>
         {!employee && (
           <NotifyFlow
-            count={(customers ?? []).length}
+            count={new Set([...appleActive, ...googleActive]).size}
             nomCommerce={merchant?.nom_commerce ?? "Votre commerce"}
             iconUrl={merchant?.logo_url ?? merchant?.photo_url ?? null}
           />

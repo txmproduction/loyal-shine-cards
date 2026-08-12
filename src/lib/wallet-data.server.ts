@@ -41,7 +41,9 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
 
   const { data: merchant } = await supabaseAdmin
     .from("merchants")
-    .select("id, nom_commerce, logo_url, photo_url, couleur_marque, access_status, trial_ends_at")
+    .select(
+      "id, nom_commerce, logo_url, photo_url, couleur_marque, access_status, trial_ends_at, message_promo",
+    )
     .eq("id", customer.merchant_id)
     .maybeSingle();
   if (!merchant) throw new Error("Commerce introuvable");
@@ -135,6 +137,7 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
         : `${goal} étoiles → ${reward}`,
       barcodeValue: customer.id,
       locationName: establishmentName,
+      promoMessage: merchant.message_promo?.trim() || undefined,
     },
   };
 }

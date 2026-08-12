@@ -121,6 +121,7 @@ export type WalletCardInput = {
   nextTierText?: string | undefined;
   barcodeValue: string;
   locationName?: string | undefined;
+  promoMessage?: string | undefined;
 };
 
 function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {
@@ -168,6 +169,25 @@ function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {
 }
 
 /** Met uniquement à jour l'objet de fidélité existant (aucune classe ni JWT). */
+export async function addWalletMessage(
+  objectSuffix: string,
+  header: string,
+  body: string,
+): Promise<boolean> {
+  const issuerId = process.env["GOOGLE_WALLET_ISSUER_ID"];
+  if (!issuerId) throw new Error("GOOGLE_WALLET_ISSUER_ID manquant");
+  const account = loadServiceAccount();
+  const token = await accessToken(account);
+  const res = await walletFetch(
+    token,
+    `/loyaltyObject/${issuerId}.${objectSuffix}/addMessage`,
+    "POST",
+    { message: { header, body, id: `promo_${Date.now()}` } },
+  );
+  if (!res.ok) console.error("[Wallet] addMessage échoué", res.status, res.json);
+  return res.ok;
+}
+
 export async function updateWalletObject(input: WalletCardInput): Promise<boolean> {
   const issuerId = process.env["GOOGLE_WALLET_ISSUER_ID"];
   if (!issuerId) throw new Error("GOOGLE_WALLET_ISSUER_ID manquant");

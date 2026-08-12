@@ -152,6 +152,16 @@ export function buildPassJson(input: WalletCardInput, serialNumber: string, orig
         },
       ],
       secondaryFields: [
+        ...(input.promoMessage
+          ? [
+              {
+                key: "promo",
+                label: "Offre du moment",
+                value: input.promoMessage,
+                changeMessage: "%@",
+              },
+            ]
+          : []),
         {
           key: "tier",
           label: "Prochain palier",
