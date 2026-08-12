@@ -7,15 +7,16 @@ const DEFAULT_LOGO =
 export const suffix = (value: string) => value.replace(/[^A-Za-z0-9_.-]/g, "_");
 
 /** Tronque proprement un nom trop long pour l'en-tête d'une carte Wallet. */
-function shortName(name: string, max = 22): string {
+function shortName(name: string, max = 40): string {
   const clean = name.trim().replace(/\s+/g, " ");
   return clean.length <= max ? clean : `${clean.slice(0, max - 1).trimEnd()}…`;
 }
 
-/** Barre de progression textuelle (Wallet n'autorise pas de vrai composant graphique). */
-function progressBar(ratio: number, segments = 10): string {
-  const filled = Math.max(0, Math.min(segments, Math.round(ratio * segments)));
-  return `${"■".repeat(filled)}${"□".repeat(segments - filled)}`;
+/** Barre de tampons : un segment par palier configuré par le commerçant. */
+function stampBar(current: number, goal: number): string {
+  const segments = Math.max(1, Math.min(20, Math.round(goal)));
+  const filled = Math.max(0, Math.min(segments, Math.round((current / goal) * segments)));
+  return `${"●".repeat(filled)}${"○".repeat(segments - filled)}`;
 }
 
 export type WalletCardContext = {
