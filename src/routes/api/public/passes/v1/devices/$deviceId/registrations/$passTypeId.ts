@@ -51,6 +51,30 @@ export const Route = createFileRoute(
           if (prev === undefined || timestamp > prev) latest.set(row.customer_id, timestamp);
         }
 
+        // Marqueur additionnel : message promo du commerçant (champ séparé du solde).
+        const { data: owners } = await supabaseAdmin
+          .from("customers")
+          .select("id, merchant_id")
+          .in("id", serials);
+        const merchantIds = [...new Set((owners ?? []).map((o) => o.merchant_id))];
+        if (merchantIds.length) {
+          const { data: promos } = await supabaseAdmin
+            .from("merchants")
+            .select("id, message_promo_date")
+            .in("id", merchantIds);
+          const promoAt = new Map(
+            (promos ?? [])
+              .filter((m) => m.message_promo_date)
+              .map((m) => [m.id, Date.parse(m.message_promo_date as string)]),
+          );
+          for (const owner of owners ?? []) {
+            const timestamp = promoAt.get(owner.merchant_id);
+            if (timestamp === undefined || !Number.isFinite(timestamp)) continue;
+            const prev = latest.get(owner.id);
+            if (prev === undefined || timestamp > prev) latest.set(owner.id, timestamp);
+          }
+        }
+
         const kept = sinceRaw
           ? serials.filter((serial) => {
               const modifiedAt = latest.get(serial);
