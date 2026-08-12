@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { BRAND_LOGO } from "@/lib/fideo";
+import { NameSpacingHint } from "@/components/fideo/NameSpacingHint";
 import { notifyAdminsNewMerchant } from "@/lib/push.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,6 +131,7 @@ function SignupPage() {
               className="border-white/15 bg-white/5 text-primary-foreground placeholder:text-primary-foreground/40"
               placeholder="Le Comptoir de Mathilde"
             />
+            <NameSpacingHint value={nomCommerce} onFix={setNomCommerce} tone="dark" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="text-primary-foreground/80">
