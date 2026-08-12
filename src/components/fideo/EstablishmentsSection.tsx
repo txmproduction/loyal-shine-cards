@@ -3,6 +3,7 @@ import { Download, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { geocoderEtablissement } from "@/lib/geocode.functions";
 import { accessState, useEstablishments, useMerchant } from "@/lib/fideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,10 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
       return;
     }
     toast.success("Établissement mis à jour");
+    // Géocodage de l'adresse (non bloquant) pour la relance de proximité Wallet.
+    if (d.adresse.trim()) {
+      void geocoderEtablissement({ data: { establishment_id: id } }).catch(() => undefined);
+    }
     refresh();
   };
 
