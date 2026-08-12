@@ -40,13 +40,17 @@ export async function pushApplePassUpdate(serialNumber: string): Promise<number>
   const keyP8 = process.env["APPLE_APNS_KEY_P8"];
   const keyId = process.env["APPLE_APNS_KEY_ID"];
   const teamId = process.env["APPLE_TEAM_ID"] ?? "QBR5LW4N8A";
-  if (!keyP8 || !keyId) return 0;
+  if (!keyP8 || !keyId) {
+    console.log("[APNs] serial", serialNumber, "regs", 0, "keyPresent", false);
+    return 0;
+  }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: regs } = await supabaseAdmin
     .from("apple_pass_registrations")
     .select("push_token")
     .eq("serial_number", serialNumber);
+  console.log("[APNs] serial", serialNumber, "regs", regs?.length, "keyPresent", Boolean(keyP8 && keyId));
   if (!regs?.length) return 0;
 
   const jwt = await apnsJwt(keyP8, keyId, teamId);
@@ -64,8 +68,15 @@ export async function pushApplePassUpdate(serialNumber: string): Promise<number>
         body: "{}",
       });
       if (res.ok) sent += 1;
-    } catch {
-      // ignore : une notification perdue n'empêche pas le scan
+      else
+        console.error(
+          "[APNs] échec",
+          res.status,
+          await res.text(),
+          "topic=pass.app.fideoloyalty.card",
+        );
+    } catch (e) {
+      console.error("[APNs] exception", e);
     }
   }
   return sent;
