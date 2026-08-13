@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { refreshWalletCard } from "@/lib/wallet.functions";
+import {
+  DEMO_CUSTOMERS,
+  DEMO_EMPLOYEES,
+  DEMO_POINTS,
+  DEMO_REWARDS,
+  useDemoMode,
+} from "@/lib/demo";
 
 /** Rafraîchit la carte Google Wallet du client sans bloquer le flux commerçant. */
 function syncWalletCard(customerId: string) {
@@ -197,10 +204,12 @@ export function useLoyaltyCard(merchantId?: string) {
 }
 
 export function useEmployees(merchantId?: string) {
+  const demo = useDemoMode();
   return useQuery({
-    queryKey: ["employees", merchantId],
-    enabled: !!merchantId,
+    queryKey: ["employees", merchantId, demo],
+    enabled: !!merchantId || demo,
     queryFn: async () => {
+      if (demo) return DEMO_EMPLOYEES;
       const { data, error } = await supabase
         .from("employees")
         .select("id, nom, pin_code, role, user_id")
@@ -229,10 +238,12 @@ export function useEstablishments(merchantId?: string) {
 }
 
 export function useCustomers(merchantId?: string) {
+  const demo = useDemoMode();
   return useQuery({
-    queryKey: ["customers", merchantId],
-    enabled: !!merchantId,
+    queryKey: ["customers", merchantId, demo],
+    enabled: !!merchantId || demo,
     queryFn: async () => {
+      if (demo) return DEMO_CUSTOMERS;
       const { data, error } = await supabase
         .from("customers")
         .select(
@@ -247,10 +258,12 @@ export function useCustomers(merchantId?: string) {
 }
 
 export function usePoints(customerIds: string[] | undefined) {
+  const demo = useDemoMode();
   return useQuery({
-    queryKey: ["points", customerIds?.length ?? 0, customerIds?.[0] ?? ""],
-    enabled: !!customerIds && customerIds.length > 0,
+    queryKey: ["points", customerIds?.length ?? 0, customerIds?.[0] ?? "", demo],
+    enabled: demo || (!!customerIds && customerIds.length > 0),
     queryFn: async () => {
+      if (demo) return DEMO_POINTS;
       const { data, error } = await supabase
         .from("points_history")
         .select("id, customer_id, employee_id, establishment_id, points_ajoutes, montant, type, date")
@@ -263,10 +276,12 @@ export function usePoints(customerIds: string[] | undefined) {
 }
 
 export function useRewards(customerIds: string[] | undefined) {
+  const demo = useDemoMode();
   return useQuery({
-    queryKey: ["rewards", customerIds?.length ?? 0, customerIds?.[0] ?? ""],
-    enabled: !!customerIds && customerIds.length > 0,
+    queryKey: ["rewards", customerIds?.length ?? 0, customerIds?.[0] ?? "", demo],
+    enabled: demo || (!!customerIds && customerIds.length > 0),
     queryFn: async () => {
+      if (demo) return DEMO_REWARDS;
       const { data, error } = await supabase
         .from("rewards_redeemed")
         .select("id, customer_id, valeur, date")
