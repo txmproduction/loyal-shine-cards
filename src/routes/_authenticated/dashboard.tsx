@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Award, Coins, Gift, UserPlus } from "lucide-react";
 import {
   Area,
@@ -15,8 +15,8 @@ import {
   YAxis,
 } from "recharts";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { setDemoMode, useDemoMode } from "@/lib/demo";
 import { StatCard } from "@/components/fideo/StatCard";
 import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
 import {
@@ -94,7 +94,7 @@ function Dashboard() {
   const { data: points } = usePoints(ids);
   const { data: rewards } = useRewards(ids);
   const { data: employees } = useEmployees(merchant?.id);
-  const [claiming, setClaiming] = useState(false);
+  const demo = useDemoMode();
 
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 864e5);
@@ -170,16 +170,11 @@ function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employees, points]);
 
-  const claimDemo = async () => {
-    setClaiming(true);
-    const { error } = await supabase.rpc("claim_demo_merchant");
-    setClaiming(false);
-    if (error) {
-      toast.error("Démo indisponible", { description: "Elle a déjà été récupérée par un compte." });
-      return;
-    }
-    toast.success("Données de démonstration chargées");
-    window.location.reload();
+  const startDemo = () => {
+    setDemoMode(true);
+    toast.success("Mode démo activé", {
+      description: "Vous visualisez un historique client fictif.",
+    });
   };
 
   if (employeeLoading || employee) return null;
@@ -191,14 +186,18 @@ function Dashboard() {
           <p className="text-sm text-muted-foreground">Bonjour 👋</p>
           <h1 className="text-3xl font-extrabold">{merchant?.nom_commerce ?? "Votre commerce"}</h1>
         </div>
-        {cls.length === 0 && (
-          <Button onClick={claimDemo} disabled={claiming} variant="outline">
-            {claiming ? "Chargement…" : "Charger la démo « La Maison Du 50 »"}
+        {demo ? (
+          <Button onClick={() => setDemoMode(false)} variant="outline">
+            Quitter le mode démo
+          </Button>
+        ) : (
+          <Button onClick={startDemo} variant="outline">
+            Charger la démo
           </Button>
         )}
       </header>
 
-      {cls.length === 0 && (
+      {cls.length === 0 && !demo && (
         <section className="animate-rise rounded-2xl border border-border bg-card p-5 shadow-soft">
           <h2 className="text-base font-bold">Bienvenue sur Fidéo 🎉</h2>
           <p className="mt-1 text-sm text-muted-foreground">

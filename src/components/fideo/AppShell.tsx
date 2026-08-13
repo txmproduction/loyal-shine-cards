@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import { setDemoMode, useDemoMode } from "@/lib/demo";
 import {
   BRAND_LOGO,
   accessState,
@@ -43,6 +44,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [scanOpen, setScanOpen] = useState(false);
+  const demo = useDemoMode();
 
   const onScan = (text: string) => {
     setScanOpen(false);
@@ -157,6 +159,17 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
           >
             {banner.text}
+          </div>
+        )}
+        {demo && (
+          <div className="flex flex-wrap items-center justify-center gap-3 bg-amber-500 px-4 py-2 text-center text-xs font-semibold text-black sm:text-sm">
+            <span>Mode démo — données fictives, rien n'est enregistré</span>
+            <button
+              onClick={() => setDemoMode(false)}
+              className="rounded-full bg-black/85 px-3 py-1 text-[11px] font-bold text-white transition-transform hover:scale-105"
+            >
+              Revenir à mon interface
+            </button>
           </div>
         )}
         <main className="animate-fade px-4 py-6 sm:px-8 sm:py-10">{children}</main>
