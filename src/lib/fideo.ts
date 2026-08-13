@@ -335,6 +335,7 @@ export function useUpdateMerchantAccess() {
 
 export function useAddPoint() {
   const qc = useQueryClient();
+  const demo = useDemoMode();
   return useMutation({
     mutationFn: async (input: {
       customer_id: string;
@@ -343,6 +344,7 @@ export function useAddPoint() {
       points: number;
       montant?: number;
     }) => {
+      if (demo) return; // Mode démo : aucune écriture en base.
       const { error } = await supabase.from("points_history").insert({
         customer_id: input.customer_id,
         employee_id: input.employee_id,
@@ -354,6 +356,7 @@ export function useAddPoint() {
       if (error) throw error;
     },
     onSuccess: (_data, variables) => {
+      if (demo) return;
       void qc.invalidateQueries({ queryKey: ["points"] });
       syncWalletCard(variables.customer_id);
     },
@@ -383,8 +386,10 @@ export function customerName(c: { nom: string | null; prenom?: string | null }) 
 
 export function useRedeemReward() {
   const qc = useQueryClient();
+  const demo = useDemoMode();
   return useMutation({
     mutationFn: async (input: { customer_id: string; valeur: string }) => {
+      if (demo) return; // Mode démo : aucune écriture en base.
       const { error } = await supabase.from("rewards_redeemed").insert(input);
       if (error) throw error;
       const { error: e2 } = await supabase.from("points_history").insert({
@@ -395,6 +400,7 @@ export function useRedeemReward() {
       if (e2) throw e2;
     },
     onSuccess: (_data, variables) => {
+      if (demo) return;
       void qc.invalidateQueries();
       syncWalletCard(variables.customer_id);
     },
