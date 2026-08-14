@@ -71,6 +71,11 @@ function ClientsPage() {
     queryKey: ["wallet-statuses", ids.length, ids[0] ?? ""],
     enabled: ids.length > 0,
     queryFn: () => fetchWalletStatuses({ data: { customer_ids: ids } }),
+    // L'activation d'un pass arrive côté Apple/Google après coup : on rafraîchit
+    // au retour sur l'onglet et toutes les 60 s pour éviter un statut figé.
+    refetchOnWindowFocus: true,
+    refetchInterval: 60_000,
+    staleTime: 0,
   });
   const appleActive = useMemo(
     () => new Set(walletStatuses?.apple ?? []),
