@@ -77,6 +77,7 @@ function OnboardingWizard() {
 
   const [step, setStep] = useState(0);
   const [nomEtab, setNomEtab] = useState("");
+  const [telephone, setTelephone] = useState("");
   const [secteur, setSecteur] = useState("");
   const [adresse, setAdresse] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
