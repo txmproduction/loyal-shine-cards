@@ -94,47 +94,82 @@ function AdminPage() {
                 onClick={() => setOpenId(openId === m.id ? null : m.id)}
                 className="flex w-full flex-wrap items-center gap-4 text-left"
               >
-              <span className="bg-brand flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-primary-foreground">
-                {m.nom_commerce.slice(0, 1).toUpperCase()}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{m.nom_commerce}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {m.email}
-                  {m.telephone ? ` · ${m.telephone}` : ""}
-                </p>
-                {m.adresse && <p className="truncate text-xs text-muted-foreground">{m.adresse}</p>}
-              </div>
-              <div className="text-right text-xs text-muted-foreground">
-                <p className="text-sm font-semibold text-foreground">{m.clients} clients</p>
-                <p>Inscrit le {new Date(m.created_at).toLocaleDateString("fr-FR")}</p>
-                <p>
-                  {m.access_status === "active"
-                    ? "Accès permanent"
-                    : m.access_status === "suspended"
-                      ? "Suspendu"
-                      : `Essai — ${trialDaysLeft(m.trial_ends_at)} j restants`}
-                </p>
-              </div>
-              <div className="flex w-full flex-wrap gap-2 sm:w-auto">
-                <Button
-                  size="sm"
-                  variant={m.access_status === "active" ? "default" : "outline"}
-                  onClick={() => setStatus(m.id, "active")}
-                >
-                  Accès permanent
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => extendTrial(m.id, m.trial_ends_at)}>
-                  +14 j d'essai
-                </Button>
-                <Button
-                  size="sm"
-                  variant={m.access_status === "suspended" ? "destructive" : "outline"}
-                  onClick={() => setStatus(m.id, "suspended")}
-                >
-                  Suspendre
-                </Button>
-              </div>
+                <span className="bg-brand flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-primary-foreground">
+                  {m.nom_commerce.slice(0, 1).toUpperCase()}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{m.nom_commerce}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {m.email}
+                    {m.telephone ? ` · ${m.telephone}` : ""}
+                  </p>
+                  {m.adresse && <p className="truncate text-xs text-muted-foreground">{m.adresse}</p>}
+                </div>
+                <div className="text-right text-xs text-muted-foreground">
+                  <p className="text-sm font-semibold text-foreground">{m.clients} clients</p>
+                  <p>Inscrit le {new Date(m.created_at).toLocaleDateString("fr-FR")}</p>
+                  <p>
+                    {m.access_status === "active"
+                      ? "Accès permanent"
+                      : m.access_status === "suspended"
+                        ? "Suspendu"
+                        : `Essai — ${trialDaysLeft(m.trial_ends_at)} j restants`}
+                  </p>
+                </div>
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${openId === m.id ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {openId === m.id && (
+                <div className="mt-4 space-y-3 rounded-2xl border border-border bg-background/50 p-4">
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <InfoRow icon={Store} label="Nom du commerce" value={m.nom_commerce} />
+                    <InfoRow icon={Globe} label="Secteur" value={m.secteur} />
+                    <InfoRow icon={Mail} label="Email" value={m.email} />
+                    <InfoRow icon={Phone} label="Téléphone" value={m.telephone} />
+                    <InfoRow icon={MapPin} label="Adresse" value={m.adresse} />
+                    <InfoRow
+                      icon={CalendarDays}
+                      label="Inscription"
+                      value={new Date(m.created_at).toLocaleDateString("fr-FR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Statut :{" "}
+                    {m.access_status === "active"
+                      ? "Accès permanent"
+                      : m.access_status === "suspended"
+                        ? "Suspendu"
+                        : `Essai (${trialDaysLeft(m.trial_ends_at)} j restants)`}
+                    {" · "}Onboarding {m.onboarding_completed ? "terminé" : "en cours"}
+                    {" · "}{m.clients} client(s)
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant={m.access_status === "active" ? "default" : "outline"}
+                      onClick={() => setStatus(m.id, "active")}
+                    >
+                      Accès permanent
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => extendTrial(m.id, m.trial_ends_at)}>
+                      +14 j d'essai
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant={m.access_status === "suspended" ? "destructive" : "outline"}
+                      onClick={() => setStatus(m.id, "suspended")}
+                    >
+                      Suspendre
+                    </Button>
+                  </div>
+                </div>
+              )}
             </li>
           ))}
           {(merchants ?? []).length === 0 && (
