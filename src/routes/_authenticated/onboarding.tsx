@@ -235,6 +235,16 @@ function OnboardingWizard() {
                 <NameSpacingHint value={nomEtab} onFix={setNomEtab} />
               </div>
               <div className="space-y-2">
+                <Label htmlFor="tel">Téléphone du commerce</Label>
+                <Input
+                  id="tel"
+                  inputMode="tel"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
+                  placeholder="06 12 34 56 78"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label>Secteur d'activité</Label>
                 <div className="flex flex-wrap gap-2">
                   {SECTEURS.map((s) => (
