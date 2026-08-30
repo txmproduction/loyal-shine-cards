@@ -156,6 +156,8 @@ function SignupPage() {
               id="tel"
               inputMode="tel"
               autoComplete="tel"
+              required
+              minLength={8}
               value={telephone}
               onChange={(ev) => setTelephone(ev.target.value)}
               className="border-white/15 bg-white/5 text-primary-foreground placeholder:text-primary-foreground/40"
