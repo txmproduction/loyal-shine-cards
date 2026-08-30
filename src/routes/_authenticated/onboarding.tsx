@@ -189,10 +189,12 @@ function OnboardingWizard() {
 
   const canNext =
     step === 0
-      ? nomEtab.trim().length > 1
-      : step === 3
-        ? (mode === "passages" ? seuil > 0 : montant > 0) && valeur.trim().length > 1
-        : true;
+      ? nomEtab.trim().length > 1 && telephone.trim().length >= 8 && secteur.trim().length > 0 && adresse.trim().length > 5
+      : step === 1
+        ? !!logoUrl
+        : step === 3
+          ? (mode === "passages" ? seuil > 0 : montant > 0) && valeur.trim().length > 1
+          : true;
 
   const preview = (
     <LoyaltyCardPreview
