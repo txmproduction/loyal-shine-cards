@@ -84,6 +84,7 @@ function Dashboard() {
   }, [employee, navigate]);
 
   const { data: merchant } = useMerchant();
+  const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: establishments } = useEstablishments(merchant?.id);
   const establishment = establishments?.[0];
 
@@ -92,7 +93,6 @@ function Dashboard() {
       void navigate({ to: "/onboarding", replace: true });
     }
   }, [employee, merchant, card, establishment, navigate]);
-  const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: customers } = useCustomers(merchant?.id);
   const ids = useMemo(() => (customers ?? []).map((c) => c.id), [customers]);
   const { data: points } = usePoints(ids);
