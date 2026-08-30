@@ -47,7 +47,7 @@ function SignupPage() {
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) void navigate({ to: "/dashboard" });
+      if (session) void navigate({ to: "/onboarding" });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
@@ -77,7 +77,7 @@ function SignupPage() {
         },
       }).catch(() => undefined);
       if (data.session) {
-        void navigate({ to: "/dashboard" });
+        void navigate({ to: "/onboarding" });
       } else {
         toast.success("Compte créé", {
           description: "Vérifiez votre boîte mail pour confirmer votre adresse.",
@@ -156,6 +156,8 @@ function SignupPage() {
               id="tel"
               inputMode="tel"
               autoComplete="tel"
+              required
+              minLength={8}
               value={telephone}
               onChange={(ev) => setTelephone(ev.target.value)}
               className="border-white/15 bg-white/5 text-primary-foreground placeholder:text-primary-foreground/40"

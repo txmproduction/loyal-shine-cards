@@ -77,6 +77,7 @@ function OnboardingWizard() {
 
   const [step, setStep] = useState(0);
   const [nomEtab, setNomEtab] = useState("");
+  const [telephone, setTelephone] = useState("");
   const [secteur, setSecteur] = useState("");
   const [adresse, setAdresse] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -92,6 +93,7 @@ function OnboardingWizard() {
   useEffect(() => {
     if (!merchant) return;
     setNomEtab((v) => v || merchant.nom_commerce);
+    setTelephone((v) => v || merchant.telephone || "");
     setSecteur((v) => v || merchant.secteur || "");
     setAdresse((v) => v || merchant.adresse || "");
     setLogoUrl((v) => v ?? merchant.logo_url);
@@ -129,12 +131,17 @@ function OnboardingWizard() {
 
   const finish = async () => {
     if (!merchant) return;
+    if (!nomEtab.trim() || !telephone.trim() || !secteur.trim() || !adresse.trim() || !logoUrl) {
+      toast.error("Veuillez remplir toutes les informations obligatoires.");
+      return;
+    }
     setBusy(true);
     const { error: e1 } = await supabase
       .from("merchants")
       .update({
-        secteur: secteur || null,
-        adresse: adresse || null,
+        telephone: telephone.trim(),
+        secteur: secteur.trim(),
+        adresse: adresse.trim(),
         logo_url: logoUrl,
         photo_url: photoUrl,
         couleur_marque: couleur,
@@ -146,9 +153,9 @@ function OnboardingWizard() {
     if (establishment) {
       await supabase
         .from("establishments")
-        .update({ nom: nomEtab || establishment.nom, adresse: adresse || null })
+        .update({ nom: nomEtab.trim(), adresse: adresse.trim() })
         .eq("id", establishment.id);
-      if (adresse) {
+      if (adresse.trim()) {
         const { geocoderEtablissement } = await import("@/lib/geocode.functions");
         void geocoderEtablissement({ data: { establishment_id: establishment.id } }).catch(
           () => undefined,
@@ -164,7 +171,7 @@ function OnboardingWizard() {
           mode_recompense: mode,
           nb_points_pour_recompense: seuil,
           montant_pour_recompense: montant,
-          valeur_recompense: valeur || "Récompense offerte",
+          valeur_recompense: valeur.trim() || "Récompense offerte",
           design: { couleur, photo_url: photoUrl },
         })
         .eq("id", card.id);
@@ -182,10 +189,12 @@ function OnboardingWizard() {
 
   const canNext =
     step === 0
-      ? nomEtab.trim().length > 1
-      : step === 3
-        ? (mode === "passages" ? seuil > 0 : montant > 0) && valeur.trim().length > 1
-        : true;
+      ? nomEtab.trim().length > 1 && telephone.trim().length >= 8 && secteur.trim().length > 0 && adresse.trim().length > 5
+      : step === 1
+        ? !!logoUrl
+        : step === 3
+          ? (mode === "passages" ? seuil > 0 : montant > 0) && valeur.trim().length > 1
+          : true;
 
   const preview = (
     <LoyaltyCardPreview
@@ -224,6 +233,16 @@ function OnboardingWizard() {
                 <Label htmlFor="etab">Nom de l'établissement</Label>
                 <Input id="etab" value={nomEtab} onChange={(e) => setNomEtab(e.target.value)} />
                 <NameSpacingHint value={nomEtab} onFix={setNomEtab} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tel">Téléphone du commerce</Label>
+                <Input
+                  id="tel"
+                  inputMode="tel"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
+                  placeholder="06 12 34 56 78"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Secteur d'activité</Label>
@@ -431,6 +450,7 @@ function OnboardingWizard() {
           {step === 5 && (
             <ul className="space-y-3 text-sm">
               <Recap label="Établissement" value={nomEtab} />
+              <Recap label="Téléphone" value={telephone} />
               <Recap label="Secteur" value={secteur || "—"} />
               <Recap label="Adresse" value={adresse || "—"} />
               <Recap

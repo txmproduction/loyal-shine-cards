@@ -315,6 +315,28 @@ export function accessState(merchant?: Merchant | null) {
   return trialDaysLeft(merchant.trial_ends_at) > 0 ? ("trial" as const) : ("expired" as const);
 }
 
+/** Vérifie que le commerçant a renseigné toutes les informations obligatoires avant de pouvoir créer/utiliser sa carte. */
+export function onboardingComplete(
+  merchant?: Merchant | null,
+  card?: LoyaltyCard | null,
+  establishment?: Establishment | null,
+) {
+  if (!merchant || !card || !establishment) return false;
+  const merchantOk =
+    (merchant.nom_commerce?.trim() ?? "").length > 1 &&
+    (merchant.telephone?.trim() ?? "").length >= 8 &&
+    (merchant.adresse?.trim() ?? "").length > 5 &&
+    (merchant.logo_url?.trim() ?? "").length > 0 &&
+    (merchant.secteur?.trim() ?? "").length > 0 &&
+    (merchant.couleur_marque?.trim() ?? "").length > 0;
+  const cardOk =
+    (card.valeur_recompense?.trim() ?? "").length > 1 &&
+    (card.mode_recompense === "montant"
+      ? Number(card.montant_pour_recompense || 0) > 0
+      : Number(card.nb_points_pour_recompense || 0) > 0);
+  return merchantOk && cardOk && (establishment.nom?.trim() ?? "").length > 1;
+}
+
 export function useUpdateMerchantAccess() {
   const qc = useQueryClient();
   return useMutation({
