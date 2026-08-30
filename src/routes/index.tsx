@@ -47,7 +47,7 @@ function SignupPage() {
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) void navigate({ to: "/dashboard" });
+      if (session) void navigate({ to: "/onboarding" });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
