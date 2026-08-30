@@ -79,8 +79,9 @@ function SignupPage() {
       if (data.session) {
         void navigate({ to: "/onboarding" });
       } else {
-        toast.success("Compte créé", {
-          description: "Vérifiez votre boîte mail pour confirmer votre adresse.",
+        toast.success("Compte créé — confirmez votre e-mail", {
+          description: `Un e-mail de confirmation vient d'être envoyé à ${email.trim()}. Cliquez sur le lien pour activer votre compte.`,
+          duration: 8000,
         });
       }
     } catch (err) {
