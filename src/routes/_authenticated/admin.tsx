@@ -21,10 +21,23 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
 });
 
+function InfoRow({ icon: Icon, label, value }: { icon: typeof Mail; label: string; value?: string | null }) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl bg-muted/40 px-3 py-2">
+      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+      <div className="min-w-0">
+        <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
+        <p className="truncate text-sm font-medium">{value && value.trim() !== "" ? value : "—"}</p>
+      </div>
+    </div>
+  );
+}
+
 function AdminPage() {
   const { data: isAdmin, isLoading } = useIsAdmin();
   const { data: merchants } = useAllMerchants(!!isAdmin);
   const update = useUpdateMerchantAccess();
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const setStatus = (id: string, access_status: string) => {
     update.mutate(
