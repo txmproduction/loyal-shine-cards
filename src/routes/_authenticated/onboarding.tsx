@@ -131,12 +131,17 @@ function OnboardingWizard() {
 
   const finish = async () => {
     if (!merchant) return;
+    if (!nomEtab.trim() || !telephone.trim() || !secteur.trim() || !adresse.trim() || !logoUrl) {
+      toast.error("Veuillez remplir toutes les informations obligatoires.");
+      return;
+    }
     setBusy(true);
     const { error: e1 } = await supabase
       .from("merchants")
       .update({
-        secteur: secteur || null,
-        adresse: adresse || null,
+        telephone: telephone.trim(),
+        secteur: secteur.trim(),
+        adresse: adresse.trim(),
         logo_url: logoUrl,
         photo_url: photoUrl,
         couleur_marque: couleur,
@@ -148,9 +153,9 @@ function OnboardingWizard() {
     if (establishment) {
       await supabase
         .from("establishments")
-        .update({ nom: nomEtab || establishment.nom, adresse: adresse || null })
+        .update({ nom: nomEtab.trim(), adresse: adresse.trim() })
         .eq("id", establishment.id);
-      if (adresse) {
+      if (adresse.trim()) {
         const { geocoderEtablissement } = await import("@/lib/geocode.functions");
         void geocoderEtablissement({ data: { establishment_id: establishment.id } }).catch(
           () => undefined,
@@ -166,7 +171,7 @@ function OnboardingWizard() {
           mode_recompense: mode,
           nb_points_pour_recompense: seuil,
           montant_pour_recompense: montant,
-          valeur_recompense: valeur || "Récompense offerte",
+          valeur_recompense: valeur.trim() || "Récompense offerte",
           design: { couleur, photo_url: photoUrl },
         })
         .eq("id", card.id);
