@@ -33,19 +33,8 @@ export const Route = createFileRoute("/_authenticated")({
       .eq("user_id", data.user.id)
       .maybeSingle();
 
-    if (merchant) {
-      const complete =
-        merchant.onboarding_completed === true &&
-        (merchant.nom_commerce?.trim() ?? "").length > 1 &&
-        (merchant.telephone?.trim() ?? "").length >= 8 &&
-        (merchant.adresse?.trim() ?? "").length > 5 &&
-        (merchant.logo_url?.trim() ?? "").length > 0 &&
-        (merchant.secteur?.trim() ?? "").length > 0 &&
-        (merchant.couleur_marque?.trim() ?? "").length > 0;
-
-      if (!complete && location.pathname !== "/onboarding") {
-        throw redirect({ to: "/onboarding", replace: true });
-      }
+    if (merchant && merchant.onboarding_completed !== true && location.pathname !== "/onboarding") {
+      throw redirect({ to: "/onboarding", replace: true });
     }
 
     return { user: data.user };
