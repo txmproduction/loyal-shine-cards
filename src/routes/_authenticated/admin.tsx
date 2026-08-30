@@ -87,8 +87,13 @@ function AdminPage() {
 
       <section className="animate-rise overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
         <ul className="divide-y divide-border">
-          {(merchants ?? []).map((m) => (
-            <li key={m.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
+          {(merchants ?? []).map((m: AdminMerchant) => (
+            <li key={m.id} className="px-5 py-4">
+              <button
+                type="button"
+                onClick={() => setOpenId(openId === m.id ? null : m.id)}
+                className="flex w-full flex-wrap items-center gap-4 text-left"
+              >
               <span className="bg-brand flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-primary-foreground">
                 {m.nom_commerce.slice(0, 1).toUpperCase()}
               </span>
