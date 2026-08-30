@@ -450,6 +450,7 @@ function OnboardingWizard() {
           {step === 5 && (
             <ul className="space-y-3 text-sm">
               <Recap label="Établissement" value={nomEtab} />
+              <Recap label="Téléphone" value={telephone} />
               <Recap label="Secteur" value={secteur || "—"} />
               <Recap label="Adresse" value={adresse || "—"} />
               <Recap
