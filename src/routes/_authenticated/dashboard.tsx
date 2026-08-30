@@ -82,15 +82,13 @@ function Dashboard() {
   }, [employee, navigate]);
 
   const { data: merchant } = useMerchant();
-  const { data: card } = useLoyaltyCard(merchant?.id);
-  const { data: establishments } = useEstablishments(merchant?.id);
-  const establishment = establishments?.[0];
 
   useEffect(() => {
-    if (!employee && merchant && card && !onboardingComplete(merchant, card, establishment)) {
+    if (!employee && merchant && merchant.onboarding_completed === false) {
       void navigate({ to: "/onboarding", replace: true });
     }
-  }, [employee, merchant, card, establishment, navigate]);
+  }, [employee, merchant, navigate]);
+  const { data: card } = useLoyaltyCard(merchant?.id);
   const { data: customers } = useCustomers(merchant?.id);
   const ids = useMemo(() => (customers ?? []).map((c) => c.id), [customers]);
   const { data: points } = usePoints(ids);
