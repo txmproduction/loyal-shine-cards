@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ShieldCheck } from "lucide-react";
-import { useAllMerchants, useIsAdmin, useUpdateMerchantAccess, trialDaysLeft } from "@/lib/fideo";
+import { useState } from "react";
+import { ShieldCheck, ChevronDown, Mail, Phone, MapPin, Store, CalendarDays, Globe } from "lucide-react";
+import { useAllMerchants, useIsAdmin, useUpdateMerchantAccess, trialDaysLeft, type AdminMerchant } from "@/lib/fideo";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { AdminPushToggle } from "@/components/fideo/AdminPushToggle";
