@@ -77,7 +77,7 @@ function SignupPage() {
         },
       }).catch(() => undefined);
       if (data.session) {
-        void navigate({ to: "/dashboard" });
+        void navigate({ to: "/onboarding" });
       } else {
         toast.success("Compte créé", {
           description: "Vérifiez votre boîte mail pour confirmer votre adresse.",
