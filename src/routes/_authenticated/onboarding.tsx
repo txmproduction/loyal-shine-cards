@@ -93,6 +93,7 @@ function OnboardingWizard() {
   useEffect(() => {
     if (!merchant) return;
     setNomEtab((v) => v || merchant.nom_commerce);
+    setTelephone((v) => v || merchant.telephone || "");
     setSecteur((v) => v || merchant.secteur || "");
     setAdresse((v) => v || merchant.adresse || "");
     setLogoUrl((v) => v ?? merchant.logo_url);
