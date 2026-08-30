@@ -22,13 +22,11 @@ import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
 import {
   DAY_LABELS,
   inRange,
-  onboardingComplete,
   pctChange,
   startOfDay,
   useCustomers,
   useEmployees,
   useEmployeeSelf,
-  useEstablishments,
   useLoyaltyCard,
   useMerchant,
   usePoints,
