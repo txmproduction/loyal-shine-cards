@@ -184,6 +184,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <span className="hidden sm:inline">Scanner un client</span>
       </button>
 
+      <AssistantChat />
+
+
       <Dialog open={scanOpen} onOpenChange={setScanOpen}>
         <DialogContent>
           <DialogHeader>
