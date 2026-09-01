@@ -64,6 +64,7 @@ function ClientsPage() {
   const { data: points } = usePoints(ids);
   const { data: rewards } = useRewards(ids);
   const addPoint = useAddPoint();
+  const removePoint = useRemovePoint();
   const redeem = useRedeemReward();
 
   const fetchWalletStatuses = useServerFn(getWalletStatuses);
