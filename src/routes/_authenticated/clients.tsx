@@ -17,6 +17,7 @@ import {
   useMerchant,
   usePoints,
   useRedeemReward,
+  useRemovePoint,
   useRewards,
   type Customer,
 } from "@/lib/fideo";
