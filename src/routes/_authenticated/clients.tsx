@@ -17,6 +17,7 @@ import {
   useMerchant,
   usePoints,
   useRedeemReward,
+  useRemovePoint,
   useRewards,
   type Customer,
 } from "@/lib/fideo";
@@ -64,6 +65,7 @@ function ClientsPage() {
   const { data: points } = usePoints(ids);
   const { data: rewards } = useRewards(ids);
   const addPoint = useAddPoint();
+  const removePoint = useRemovePoint();
   const redeem = useRedeemReward();
 
   const fetchWalletStatuses = useServerFn(getWalletStatuses);
@@ -91,6 +93,7 @@ function ClientsPage() {
   const [scanOpen, setScanOpen] = useState(false);
   const [active, setActive] = useState<Customer | null>(null);
   const [amount, setAmount] = useState("1");
+  const [opMode, setOpMode] = useState<"add" | "remove">("add");
   const [qrFor, setQrFor] = useState<Customer | null>(null);
 
   const amountMode = isAmountMode(card);
@@ -148,19 +151,30 @@ function ClientsPage() {
       toast.error(amountMode ? "Montant invalide" : "Nombre de points invalide");
       return;
     }
-    await addPoint.mutateAsync({
+    const payload = {
       customer_id: active.id,
       employee_id: employee?.id ?? null,
       establishment_id: null,
       points: amountMode ? 1 : Math.round(value),
       montant: amountMode ? value : 0,
-    });
-    toast.success(
-      amountMode ? `+${value.toFixed(2)} € enregistrés` : `+${Math.round(value)} point(s)`,
-      { description: customerName(active) },
-    );
+    };
+    if (opMode === "add") {
+      await addPoint.mutateAsync(payload);
+      toast.success(
+        amountMode ? `+${value.toFixed(2)} € enregistrés` : `+${Math.round(value)} point(s)`,
+        { description: customerName(active) },
+      );
+    } else {
+      await removePoint.mutateAsync(payload);
+      toast.success(
+        amountMode ? `−${value.toFixed(2)} € retirés` : `−${Math.round(value)} point(s) retirés`,
+        { description: customerName(active) },
+      );
+    }
     setActive(null);
+    setOpMode("add");
   };
+
 
   const rows = (customers ?? [])
     .filter((c) => !myCustomerIds || myCustomerIds.has(c.id) || active?.id === c.id)
@@ -264,8 +278,8 @@ function ClientsPage() {
                           {h.type === "recompense"
                             ? "Récompense"
                             : amountMode
-                              ? `+${Number(h.montant).toFixed(2)} €`
-                              : `+${h.points_ajoutes} point`}
+                              ? `${Number(h.montant) < 0 ? "" : "+"}${Number(h.montant).toFixed(2)} €`
+                              : `${h.points_ajoutes < 0 ? "" : "+"}${h.points_ajoutes} point`}
                         </span>
                       </li>
                     ))}
@@ -307,8 +321,32 @@ function ClientsPage() {
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-2 rounded-xl bg-secondary p-1">
+                  {(["add", "remove"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setOpMode(m)}
+                      className={
+                        opMode === m
+                          ? "bg-brand rounded-lg px-3 py-2 text-sm font-semibold text-primary-foreground"
+                          : "rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
+                      }
+                    >
+                      {m === "add" ? "Ajouter" : "Retirer (erreur)"}
+                    </button>
+                  ))}
+                </div>
                 <div className="space-y-2">
-                  <Label>{amountMode ? "Montant dépensé (€)" : "Nombre de points à ajouter"}</Label>
+                  <Label>
+                    {amountMode
+                      ? opMode === "add"
+                        ? "Montant dépensé (€)"
+                        : "Montant à retirer (€)"
+                      : opMode === "add"
+                        ? "Nombre de points à ajouter"
+                        : "Nombre de points à retirer"}
+                  </Label>
                   {amountMode ? (
                     <Input
                       type="number"
@@ -327,7 +365,8 @@ function ClientsPage() {
                           variant={amount === String(n) ? "default" : "outline"}
                           onClick={() => setAmount(String(n))}
                         >
-                          +{n}
+                          {opMode === "add" ? "+" : "−"}
+                          {n}
                         </Button>
                       ))}
                       <Input
@@ -340,8 +379,13 @@ function ClientsPage() {
                     </div>
                   )}
                 </div>
-                <Button className="w-full" onClick={validate} disabled={addPoint.isPending}>
-                  Valider
+                <Button
+                  className="w-full"
+                  variant={opMode === "remove" ? "destructive" : "default"}
+                  onClick={validate}
+                  disabled={addPoint.isPending || removePoint.isPending}
+                >
+                  {opMode === "add" ? "Valider" : "Retirer"}
                 </Button>
                 {balanceOf(active.id) >= goal && (
                   <Button

@@ -3,6 +3,7 @@ import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLi
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { QrScanner } from "@/components/fideo/QrScanner";
+import { AssistantChat } from "@/components/fideo/AssistantChat";
 import {
   Dialog,
   DialogContent,
@@ -183,6 +184,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <ScanLine className="h-5 w-5" />
         <span className="hidden sm:inline">Scanner un client</span>
       </button>
+
+      <AssistantChat />
+
 
       <Dialog open={scanOpen} onOpenChange={setScanOpen}>
         <DialogContent>
