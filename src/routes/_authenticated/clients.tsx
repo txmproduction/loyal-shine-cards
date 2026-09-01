@@ -278,8 +278,8 @@ function ClientsPage() {
                           {h.type === "recompense"
                             ? "Récompense"
                             : amountMode
-                              ? `+${Number(h.montant).toFixed(2)} €`
-                              : `+${h.points_ajoutes} point`}
+                              ? `${Number(h.montant) < 0 ? "" : "+"}${Number(h.montant).toFixed(2)} €`
+                              : `${h.points_ajoutes < 0 ? "" : "+"}${h.points_ajoutes} point`}
                         </span>
                       </li>
                     ))}
