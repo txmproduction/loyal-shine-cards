@@ -91,6 +91,7 @@ function ClientsPage() {
   const [scanOpen, setScanOpen] = useState(false);
   const [active, setActive] = useState<Customer | null>(null);
   const [amount, setAmount] = useState("1");
+  const [opMode, setOpMode] = useState<"add" | "remove">("add");
   const [qrFor, setQrFor] = useState<Customer | null>(null);
 
   const amountMode = isAmountMode(card);
