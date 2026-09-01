@@ -385,6 +385,37 @@ export function useAddPoint() {
   });
 }
 
+/** Retire des points (ou un montant) après une erreur de saisie : écriture négative dans l'historique. */
+export function useRemovePoint() {
+  const qc = useQueryClient();
+  const demo = useDemoMode();
+  return useMutation({
+    mutationFn: async (input: {
+      customer_id: string;
+      employee_id: string | null;
+      establishment_id: string | null;
+      points: number;
+      montant?: number;
+    }) => {
+      if (demo) return; // Mode démo : aucune écriture en base.
+      const { error } = await supabase.from("points_history").insert({
+        customer_id: input.customer_id,
+        employee_id: input.employee_id,
+        establishment_id: input.establishment_id,
+        points_ajoutes: -Math.abs(input.points),
+        montant: -Math.abs(input.montant ?? 0),
+        type: "correction",
+      });
+      if (error) throw error;
+    },
+    onSuccess: (_data, variables) => {
+      if (demo) return;
+      void qc.invalidateQueries({ queryKey: ["points"] });
+      syncWalletCard(variables.customer_id);
+    },
+  });
+}
+
 /* ---------- Reward mode helpers ---------- */
 
 export function isAmountMode(card?: LoyaltyCard | null) {
