@@ -149,19 +149,30 @@ function ClientsPage() {
       toast.error(amountMode ? "Montant invalide" : "Nombre de points invalide");
       return;
     }
-    await addPoint.mutateAsync({
+    const payload = {
       customer_id: active.id,
       employee_id: employee?.id ?? null,
       establishment_id: null,
       points: amountMode ? 1 : Math.round(value),
       montant: amountMode ? value : 0,
-    });
-    toast.success(
-      amountMode ? `+${value.toFixed(2)} € enregistrés` : `+${Math.round(value)} point(s)`,
-      { description: customerName(active) },
-    );
+    };
+    if (opMode === "add") {
+      await addPoint.mutateAsync(payload);
+      toast.success(
+        amountMode ? `+${value.toFixed(2)} € enregistrés` : `+${Math.round(value)} point(s)`,
+        { description: customerName(active) },
+      );
+    } else {
+      await removePoint.mutateAsync(payload);
+      toast.success(
+        amountMode ? `−${value.toFixed(2)} € retirés` : `−${Math.round(value)} point(s) retirés`,
+        { description: customerName(active) },
+      );
+    }
     setActive(null);
+    setOpMode("add");
   };
+
 
   const rows = (customers ?? [])
     .filter((c) => !myCustomerIds || myCustomerIds.has(c.id) || active?.id === c.id)
