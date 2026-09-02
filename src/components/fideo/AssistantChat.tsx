@@ -140,8 +140,11 @@ export function AssistantChat() {
       {open && (
         <div className="animate-rise fixed bottom-20 left-3 right-3 z-50 flex h-[70vh] max-h-[560px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft sm:right-auto sm:w-[380px]">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <div className="flex items-center gap-2 text-sm font-semibold">
-              <Bot className="h-4 w-4 text-primary" /> Assistant Fidéo
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <Bot className="h-4 w-4 text-primary" /> Assistant Fidéo
+              </div>
+              <span className="text-[10px] text-muted-foreground">Vous discutez avec une intelligence artificielle.</span>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Fermer">
               <X className="h-4 w-4 text-muted-foreground" />
