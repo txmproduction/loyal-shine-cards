@@ -1,18 +1,18 @@
 # Conditions Générales de Vente et d'Utilisation
 
-Version 1.0 — Dernière mise à jour : 8 août 2026
+Version 1.1 — Dernière mise à jour : 2 septembre 2026
 
 Les présentes conditions s'appliquent à tout commerçant souscrivant au service Fidéo.
 
 ## 1. Objet
 
-Les présentes Conditions Générales de Vente et d'Utilisation (ci-après « Conditions » ou « CGV/CGU ») régissent l'accès et l'utilisation de la plateforme Fidéo accessible via [fideoloyalty.fr](https://fideoloyalty.fr/) (ci-après le « Service »), un service de logiciel en mode SaaS permettant à des professionnels (ci-après le « Commerçant ») de créer et gérer des cartes de fidélité numériques compatibles Apple Wallet et Google Wallet.
+Les présentes Conditions Générales de Vente et d'Utilisation (ci-après « Conditions » ou « CGV/CGU ») régissent l'accès et l'utilisation de la plateforme Fidéo accessible via fideoloyalty.fr (ci-après le « Service »), un service de logiciel en mode SaaS permettant à des professionnels (ci-après le « Commerçant ») de créer et gérer des cartes de fidélité numériques compatibles Apple Wallet et Google Wallet.
 
 En souscrivant au Service, le Commerçant accepte sans réserve l'intégralité des présentes Conditions ainsi que la Politique de Confidentialité et le Contrat de Sous-traitance (DPA).
 
 ## 2. Éditeur du Service
 
-Le Service est édité par **TXM Production**, SAS au capital de 1 000 €, SIREN 105 679 633, dont le siège social est situé 47 rue Vivienne, 75002 Paris. Responsable de publication : Guillaume Sofyann. Contact : contact.txmproduction@gmail.com.
+Le Service est édité par TXM Production, SAS au capital de 1 000 €, SIREN 105 679 633, dont le siège social est situé 47 rue Vivienne, 75002 Paris. Responsable de publication : Guillaume Sofyann. Contact : contact.txmproduction@gmail.com.
 
 ## 3. Inscription, compte et essai gratuit
 
@@ -25,7 +25,6 @@ Le Commerçant est seul responsable de la confidentialité de ses identifiants d
 ## 4. Description du Service
 
 Fidéo propose, en l'état actuel :
-
 - La création et la configuration d'une carte de fidélité numérique personnalisable (logo, couleurs, mécanique de fidélité par passages ou par montant dépensé).
 - La génération de passes Apple Wallet (.pkpass) et Google Wallet associés à chaque client final.
 - Un scanner QR code pour ajouter des points en boutique, accessible au Commerçant et à ses employés.
@@ -37,9 +36,9 @@ Fidéo peut faire évoluer le périmètre fonctionnel du Service à tout moment,
 
 ## 5. Tarifs et paiement
 
-Le Service est facturé selon le plan choisi : **29 € HT par mois**, ou **290 € HT par an** (soit 2 mois offerts par rapport au tarif mensuel). Tous les prix affichés sur le site sont indiqués hors taxes ; la TVA applicable est ajoutée en sus. Les tarifs sont ceux affichés sur le site au jour de la souscription. En cas de modification, les nouveaux tarifs s'appliquent uniquement aux nouvelles souscriptions ou à la prochaine échéance, après notification par email au moins 30 jours à l'avance.
+Le Service est facturé selon le plan choisi : 29 € HT par mois, ou 290 € HT par an (soit 2 mois offerts par rapport au tarif mensuel). Tous les prix affichés sur le site sont indiqués hors taxes ; la TVA applicable est ajoutée en sus. Les tarifs sont ceux affichés sur le site au jour de la souscription. En cas de modification, les nouveaux tarifs s'appliquent uniquement aux nouvelles souscriptions ou à la prochaine échéance, après notification par email au moins 30 jours à l'avance.
 
-Le paiement est effectué par carte bancaire via notre prestataire de paiement **Stripe**. Les coordonnées bancaires ne transitent jamais par les serveurs de Fidéo. Le Commerçant peut consulter et télécharger ses factures depuis son espace personnel.
+Le paiement est effectué par carte bancaire via notre prestataire de paiement Stripe. Les coordonnées bancaires ne transitent jamais par les serveurs de Fidéo. Le Commerçant peut consulter et télécharger ses factures depuis son espace personnel.
 
 En cas d'échec de prélèvement, Fidéo peut suspendre l'accès au Service après notification. Le rétablissement est immédiat dès régularisation.
 
@@ -49,7 +48,21 @@ L'abonnement est conclu pour une durée mensuelle ou annuelle, reconduite tacite
 
 Le Commerçant peut résilier son abonnement à tout moment et en quelques clics depuis son espace personnel, conformément à l'article L215-1-1 du Code de la consommation. La résiliation prend effet à la fin de la période de facturation en cours ; aucune somme déjà versée n'est remboursée.
 
+**6.1 Résiliation pour manquement grave**
+
 Fidéo peut résilier le contrat de plein droit, après mise en demeure restée sans effet pendant 15 jours, en cas de manquement grave du Commerçant aux présentes Conditions (notamment : utilisation frauduleuse, contenu illicite, défaut de paiement).
+
+**6.2 Suspension immédiate**
+
+Par dérogation à l'article 6.1, et sans préjudice de toute action ultérieure, Fidéo se réserve le droit de suspendre immédiatement et sans préavis ni mise en demeure préalable l'accès du Commerçant au Service, dès lors qu'il a connaissance, par quelque moyen que ce soit (signalement d'un tiers, autorité administrative ou judiciaire, constat direct), d'éléments laissant raisonnablement penser que le Commerçant utilise le Service dans le cadre d'une activité manifestement illicite au sens de l'article 8.
+
+Cette suspension conservatoire est notifiée au Commerçant par email dans les meilleurs délais, avec l'indication des motifs. Le Commerçant dispose d'un délai de 15 jours à compter de cette notification pour apporter tout élément justificatif de nature à lever le doute. À défaut de réponse ou d'élément suffisant dans ce délai, la suspension pourra être convertie en résiliation de plein droit du contrat, sans préjudice des sommes déjà dues et sans indemnité au profit du Commerçant.
+
+Si les éléments apportés par le Commerçant lèvent raisonnablement le doute, l'accès au Service est rétabli sans délai.
+
+**6.3 Absence d'obligation de contrôle**
+
+Fidéo n'a pas d'obligation générale de surveillance de l'activité des Commerçants et n'exerce aucun contrôle a priori sur la nature des biens ou services vendus par ceux-ci. Les dispositions des articles 6.1 et 6.2 s'exercent uniquement sur la base d'éléments portés à la connaissance de Fidéo, conformément au régime de responsabilité applicable aux prestataires techniques (notamment la loi n°2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique).
 
 ## 7. Droit de rétractation
 
@@ -64,8 +77,11 @@ Le Commerçant s'engage à :
 - Fournir des informations exactes et les mettre à jour.
 - Utiliser le Service conformément à sa finalité et à la réglementation applicable, notamment en matière de protection des données personnelles, de pratiques commerciales et de propriété intellectuelle.
 - Ne pas publier de contenu illicite, diffamatoire, contrefaisant ou contraire aux bonnes mœurs (logos, photos, messages).
+- **Ne pas utiliser le Service, directement ou indirectement, dans le cadre d'une activité commerciale illégale, y compris notamment la vente de produits ou services interdits, contrefaits, dangereux ou non conformes à la réglementation en vigueur, le blanchiment d'argent, ou toute activité contraire à l'ordre public. Le Commerçant garantit disposer de l'ensemble des autorisations, licences et déclarations requises pour l'exercice de son activité commerciale.**
 - Ne pas tenter de contourner les mécanismes de sécurité ni d'extraire massivement des données du Service.
 - Respecter ses propres obligations RGPD à l'égard de ses clients finaux, en sa qualité de responsable de traitement (cf. DPA).
+
+**Le Commerçant demeure seul et unique responsable de la licéité de son activité commerciale, des produits ou services qu'il propose, et de la conformité de ceux-ci à la réglementation applicable. Fidéo n'exerce aucun contrôle, a priori ou a posteriori, sur la nature de l'activité du Commerçant et n'intervient qu'en qualité de prestataire technique d'un outil de fidélisation, sans lien avec la nature des biens ou services vendus par le Commerçant.**
 
 ## 9. Propriété intellectuelle
 
@@ -79,6 +95,7 @@ Fidéo met en œuvre des moyens raisonnables pour assurer une disponibilité con
 
 - Des interruptions liées à la maintenance, à des incidents de force majeure ou à des défaillances de prestataires tiers (Lovable, Supabase, Stripe, Apple, Google).
 - Des conséquences de l'utilisation que le Commerçant fait du Service vis-à-vis de ses propres clients.
+- **De la licéité, de la conformité réglementaire ou de la nature des produits et services proposés par le Commerçant dans le cadre de son activité commerciale.**
 - Des pertes indirectes (perte de chiffre d'affaires, de clientèle, d'image).
 
 En tout état de cause, et sauf faute lourde ou intentionnelle de Fidéo, sa responsabilité est limitée au montant total des sommes versées par le Commerçant au titre des 12 derniers mois.
