@@ -1,6 +1,6 @@
-# Contrat de Sous-traitance des Données Personnelles (DPA)
+# 3. Contrat de Sous-traitance des Données Personnelles (DPA)
 
-Version 1.0 — Dernière mise à jour : 8 août 2026
+Version 1.1 — Dernière mise à jour : 2 septembre 2026
 
 Conforme à l'article 28 du Règlement (UE) 2016/679 (RGPD).
 
@@ -12,8 +12,8 @@ Le DPA fait partie intégrante des Conditions Générales et est accepté par le
 
 ## 1. Qualification des parties
 
-- Le **Commerçant** est le Responsable de traitement : il détermine les finalités et les moyens du programme de fidélité, collecte les données de ses clients finaux.
-- **TXM Production** est le Sous-traitant : il traite ces données pour le compte du Commerçant, exclusivement sur instruction documentée de ce dernier.
+- Le Commerçant est le Responsable de traitement : il détermine les finalités et les moyens du programme de fidélité, collecte les données de ses clients finaux.
+- TXM Production est le Sous-traitant : il traite ces données pour le compte du Commerçant, exclusivement sur instruction documentée de ce dernier.
 
 ## 2. Description du traitement
 
@@ -38,10 +38,10 @@ TXM Production s'engage à :
 
 Le Commerçant autorise TXM Production à recourir à des sous-traitants ultérieurs pour fournir le Service, notamment :
 
-- **Supabase** (base de données, UE)
-- **Lovable** (hébergement applicatif)
-- **Stripe** (prestataire de paiement)
-- **Apple** et **Google** (distribution Wallet)
+- Supabase (base de données, UE)
+- Lovable (hébergement applicatif)
+- Stripe (prestataire de paiement)
+- Apple et Google (distribution Wallet)
 
 En cas d'ajout ou de remplacement d'un sous-traitant ultérieur, TXM Production en informera le Commerçant par email au moins 30 jours à l'avance.
 

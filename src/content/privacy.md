@@ -1,14 +1,14 @@
-# Politique de Confidentialité
+# 2. Politique de Confidentialité
 
-Version 1.0 — Dernière mise à jour : 8 août 2026
+Version 1.1 — Dernière mise à jour : 2 septembre 2026
 
 Conforme aux articles 13 et 14 du Règlement (UE) 2016/679 (RGPD) et à la loi Informatique et Libertés.
 
 ## 1. Responsable de traitement
 
-Le responsable de traitement est **TXM Production**, SAS au capital de 1 000 €, SIREN 105 679 633, siège social 47 rue Vivienne, 75002 Paris. Responsable de publication : Guillaume Sofyann. Contact (général et demandes RGPD) : contact.txmproduction@gmail.com.
+Le responsable de traitement est TXM Production, SAS au capital de 1 000 €, SIREN 105 679 633, siège social 47 rue Vivienne, 75002 Paris. Responsable de publication : Guillaume Sofyann. Contact (général et demandes RGPD) : contact.txmproduction@gmail.com.
 
-**Important.** Lorsqu'un commerçant utilise Fidéo pour gérer son programme de fidélité, c'est ce commerçant qui est responsable de traitement des données de ses clients finaux. TXM Production agit alors comme sous-traitant, dans les conditions définies par notre Contrat de Sous-traitance (DPA).
+Important. Lorsqu'un commerçant utilise Fidéo pour gérer son programme de fidélité, c'est ce commerçant qui est responsable de traitement des données de ses clients finaux. TXM Production agit alors comme sous-traitant, dans les conditions définies par notre Contrat de Sous-traitance (DPA).
 
 ## 2. Données traitées
 
@@ -43,11 +43,11 @@ Le responsable de traitement est **TXM Production**, SAS au capital de 1 000 €
 
 Les données sont accessibles aux personnels habilités de TXM Production et aux sous-traitants suivants, dans la limite stricte de leurs missions techniques :
 
-- **Supabase** — base de données et authentification (UE)
-- **Lovable** — hébergement applicatif
-- **Stripe** — traitement des paiements (UE/US, DPF)
-- **Apple** — distribution Apple Wallet, notifications APNS (US, DPF)
-- **Google** — distribution Google Wallet (US, DPF)
+- Supabase — base de données et authentification (UE)
+- Lovable — hébergement applicatif
+- Stripe — traitement des paiements (UE/US, DPF)
+- Apple — distribution Apple Wallet, notifications APNS (US, DPF)
+- Google — distribution Google Wallet (US, DPF)
 
 Aucune donnée n'est vendue à des tiers.
 
