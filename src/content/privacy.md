@@ -1,4 +1,4 @@
-# 2. Politique de Confidentialité
+# Politique de Confidentialité
 
 Version 1.1 — Dernière mise à jour : 2 septembre 2026
 

@@ -1,4 +1,4 @@
-# 3. Contrat de Sous-traitance des Données Personnelles (DPA)
+# Contrat de Sous-traitance des Données Personnelles (DPA)
 
 Version 1.1 — Dernière mise à jour : 2 septembre 2026
 

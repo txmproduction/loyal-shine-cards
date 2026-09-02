@@ -1,4 +1,4 @@
-# 1. Conditions Générales de Vente et d'Utilisation
+# Conditions Générales de Vente et d'Utilisation
 
 Version 1.1 — Dernière mise à jour : 2 septembre 2026
 
