@@ -1,9 +1,12 @@
 # Roadmap
 
-## App iOS (Capacitor)
-- [ ] Mode de build mobile statique -> dist/mobile
-- [ ] Installer @capacitor/core, cli, ios, camera, push-notifications
-- [ ] capacitor.config.ts (app.fideoloyalty.card, Fidéo, webDir dist/mobile)
-- [ ] Scan QR natif (Capacitor) avec repli web
-- [ ] Notifications push natives iOS avec repli Web Push
-- [ ] Instructions export GitHub / cap add ios / cap sync / Xcode (Team QBR5LW4N8A)
+## App iOS (Capacitor) — fait
+- [x] Build mobile statique -> dist/mobile (npm run build:mobile)
+- [x] Capacitor core/cli/ios + camera, push, barcode, haptics, share
+- [x] capacitor.config.ts (app.fideoloyalty.card / Fidéo / dist/mobile)
+- [x] Scan QR natif avec repli web
+- [x] Notifications natives iOS avec repli Web Push
+- [x] Instructions Xcode / App Store (IOS_APP_STORE.md)
+
+## Reste à faire (côté vous)
+- [ ] Clé APNs pour app.fideoloyalty.card, à brancher côté serveur pour l'envoi réel
