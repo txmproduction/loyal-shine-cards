@@ -138,6 +138,11 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // App iOS native : les appels serveur pointent vers le backend Fidéo hébergé.
+  useEffect(() => {
+    void import("@/lib/native").then((m) => m.installNativeApiBridge());
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
