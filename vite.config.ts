@@ -11,10 +11,11 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const isMobileBuild = process.env["MOBILE_BUILD"] === "1";
 
 export default defineConfig({
-  tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
-    ...(isMobileBuild ? { spa: { enabled: true } } : {}),
-  },
+  tanstackStart: isMobileBuild
+    ? { spa: { enabled: true } }
+    : {
+        // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
+        // nitro/vite builds from this
+        server: { entry: "server" },
+      },
 });
