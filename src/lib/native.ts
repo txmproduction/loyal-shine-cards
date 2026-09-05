@@ -130,7 +130,7 @@ export async function shareNative(options: {
   if (!isNative()) return false;
   try {
     const { Share } = await import("@capacitor/share");
-    await Share.share({ dialogTitle: options.title, ...options });
+    await Share.share({ ...options, ...(options.title ? { dialogTitle: options.title } : {}) });
     return true;
   } catch {
     return false;
