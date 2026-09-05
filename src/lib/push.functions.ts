@@ -48,6 +48,8 @@ export const notifyAdminsNewMerchant = createServerFn({ method: "POST" })
 
     let sent = 0;
     for (const row of rows) {
+      // Les jetons de l'app iOS native (APNs) ne passent pas par le Web Push.
+      if (row.endpoint.startsWith("apns:")) continue;
       try {
         const sub = row.subscription as unknown as {
           endpoint: string;
