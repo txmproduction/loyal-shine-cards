@@ -48,6 +48,8 @@ export const notifyAdminsNewMerchant = createServerFn({ method: "POST" })
 
     let sent = 0;
     for (const row of rows) {
+      // Les jetons de l'app iOS native (APNs) ne passent pas par le Web Push.
+      if (row.endpoint.startsWith("apns:")) continue;
       try {
         const sub = row.subscription as unknown as {
           endpoint: string;
@@ -67,4 +69,26 @@ export const notifyAdminsNewMerchant = createServerFn({ method: "POST" })
       }
     }
     return { sent };
+  });
+/** Enregistre le jeton APNs de l'app iOS native (Capacitor) pour un admin. */
+export const saveNativePushToken = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { token: string; platform: string }) => input)
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const { error } = await context.supabase.from("admin_push_subscriptions").upsert(
+      {
+        user_id: context.userId,
+        endpoint: `apns:${data.token}`,
+        subscription: { native: true, platform: data.platform, token: data.token },
+      },
+      { onConflict: "endpoint" },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });

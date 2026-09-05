@@ -6,10 +6,18 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// Build "mobile" (npm run build:mobile) : sortie 100 % client embarquée dans l'app iOS.
+// Le build web habituel n'est pas affecté.
+const isMobileBuild = process.env["MOBILE_BUILD"] === "1";
+
 export default defineConfig({
-  tanstackStart: {
-    // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-    // nitro/vite builds from this
-    server: { entry: "server" },
-  },
+  // Le build mobile n'a pas de serveur : pas de bundle Nitro.
+  ...(isMobileBuild ? { nitro: false as const } : {}),
+  tanstackStart: isMobileBuild
+    ? { spa: { enabled: true } }
+    : {
+        // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
+        // nitro/vite builds from this
+        server: { entry: "server" },
+      },
 });

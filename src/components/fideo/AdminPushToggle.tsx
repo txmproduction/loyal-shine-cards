@@ -11,15 +11,23 @@ import {
 import {
   removeAdminPushSubscription,
   saveAdminPushSubscription,
+  saveNativePushToken,
 } from "@/lib/push.functions";
+import { isNative, nativePlatform, registerNativePush, unregisterNativePush } from "@/lib/native";
 
 export function AdminPushToggle() {
   const [enabled, setEnabled] = useState(false);
   const [busy, setBusy] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission | "unsupported">("default");
   const [iosHint, setIosHint] = useState(false);
+  const [native, setNative] = useState(false);
 
   useEffect(() => {
+    if (isNative()) {
+      setNative(true);
+      setPermission("default");
+      return;
+    }
     setIosHint(needsIosInstall() && !pushSupported());
     if (!pushSupported()) {
       setPermission("unsupported");
@@ -33,6 +41,13 @@ export function AdminPushToggle() {
     setBusy(true);
     try {
       if (next) {
+        if (native) {
+          const { token } = await registerNativePush();
+          await saveNativePushToken({ data: { token, platform: nativePlatform() } });
+          setEnabled(true);
+          toast.success("Notifications activées sur cet iPhone");
+          return;
+        }
         const sub = await subscribeToPush();
         setPermission(Notification.permission);
         const json = sub.toJSON() as { endpoint?: string; keys?: { p256dh: string; auth: string } };
@@ -42,6 +57,12 @@ export function AdminPushToggle() {
         setEnabled(true);
         toast.success("Notifications activées");
       } else {
+        if (native) {
+          await unregisterNativePush();
+          setEnabled(false);
+          toast.success("Notifications désactivées");
+          return;
+        }
         const sub = await getExistingSubscription();
         if (sub) {
           await removeAdminPushSubscription({ data: { endpoint: sub.endpoint } });
@@ -53,7 +74,7 @@ export function AdminPushToggle() {
     } catch (err) {
       if (err instanceof Error && err.message === "permission-denied") {
         setPermission("denied");
-        toast.error("Permission refusée par le navigateur");
+        toast.error("Permission refusée — autorisez les notifications dans les réglages");
       } else {
         toast.error("Action impossible", {
           description: err instanceof Error ? err.message : undefined,
@@ -64,8 +85,11 @@ export function AdminPushToggle() {
     }
   };
 
-  const statusLabel =
-    permission === "unsupported"
+  const statusLabel = native
+    ? enabled
+      ? "Activé sur cet iPhone"
+      : "Désactivé"
+    : permission === "unsupported"
       ? "Non pris en charge sur cet appareil"
       : permission === "denied"
         ? "Permission refusée — autorisez les notifications dans les réglages du navigateur"
