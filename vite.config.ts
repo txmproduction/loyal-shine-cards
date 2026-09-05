@@ -11,6 +11,8 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const isMobileBuild = process.env["MOBILE_BUILD"] === "1";
 
 export default defineConfig({
+  // Le build mobile n'a pas de serveur : pas de bundle Nitro.
+  ...(isMobileBuild ? { nitro: false as const } : {}),
   tanstackStart: isMobileBuild
     ? { spa: { enabled: true } }
     : {
