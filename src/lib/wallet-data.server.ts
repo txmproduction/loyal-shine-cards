@@ -98,7 +98,8 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
     : undefined;
   establishmentName = own?.nom ?? undefined;
 
-  const relevant = own ? [own] : list;
+  const geoActive = merchant.geo_relance_active !== false;
+  const relevant = geoActive ? (own ? [own] : list) : [];
   const locations: Array<{ latitude: number; longitude: number }> = [];
   for (const est of relevant) {
     if (typeof est.latitude === "number" && typeof est.longitude === "number") {
@@ -156,6 +157,8 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
       locationName: establishmentName,
       promoMessage: merchant.message_promo?.trim() || undefined,
       locations: locations.length ? locations.slice(0, 10) : undefined,
+      geoRadiusMeters: merchant.geo_relance_rayon_m ?? 1500,
+      geoMessage: merchant.geo_relance_message?.trim() || undefined,
     },
   };
 }
