@@ -201,14 +201,36 @@ export function AssistantChat() {
             {action && (
               <div className="rounded-2xl border border-primary/40 bg-primary/5 p-3">
                 <p className="text-xs text-muted-foreground">
-                  {action.type === "add" ? "Ajouter" : "Retirer"}{" "}
-                  {amountMode
-                    ? `${Math.abs(Number(action.quantity ?? 0)).toFixed(2)} €`
-                    : `${Math.abs(Math.round(Number(action.quantity ?? 1)))} point(s)`}{" "}
-                  · {action.label ?? "client"}
+                  {action.type === "create" ? (
+                    <>
+                      Créer le client · {[action.prenom, action.nom].filter(Boolean).join(" ")}
+                      {action.telephone ? ` · ${action.telephone}` : ""}
+                    </>
+                  ) : action.type === "delete" ? (
+                    <>Supprimer définitivement · {action.label ?? "client"}</>
+                  ) : (
+                    <>
+                      {action.type === "add" ? "Ajouter" : "Retirer"}{" "}
+                      {amountMode
+                        ? `${Math.abs(Number(action.quantity ?? 0)).toFixed(2)} €`
+                        : `${Math.abs(Math.round(Number(action.quantity ?? 1)))} point(s)`}{" "}
+                      · {action.label ?? "client"}
+                    </>
+                  )}
                 </p>
                 <div className="mt-2 flex gap-2">
-                  <Button size="sm" onClick={confirm} disabled={addPoint.isPending || removePoint.isPending}>
+                  <Button
+                    size="sm"
+                    variant={action.type === "delete" ? "destructive" : "default"}
+                    onClick={confirm}
+                    disabled={
+                      addPoint.isPending ||
+                      removePoint.isPending ||
+                      createCustomer.isPending ||
+                      deleteCustomer.isPending
+                    }
+                  >
+
                     <Check className="mr-1 h-4 w-4" /> Confirmer
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => setAction(null)}>
