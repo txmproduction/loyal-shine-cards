@@ -249,6 +249,9 @@ export type Database = {
           couleur_marque: string | null
           created_at: string
           email: string
+          geo_relance_active: boolean
+          geo_relance_message: string | null
+          geo_relance_rayon_m: number
           id: string
           logo_url: string | null
           message_promo: string | null
@@ -268,6 +271,9 @@ export type Database = {
           couleur_marque?: string | null
           created_at?: string
           email: string
+          geo_relance_active?: boolean
+          geo_relance_message?: string | null
+          geo_relance_rayon_m?: number
           id?: string
           logo_url?: string | null
           message_promo?: string | null
@@ -287,6 +293,9 @@ export type Database = {
           couleur_marque?: string | null
           created_at?: string
           email?: string
+          geo_relance_active?: boolean
+          geo_relance_message?: string | null
+          geo_relance_rayon_m?: number
           id?: string
           logo_url?: string | null
           message_promo?: string | null

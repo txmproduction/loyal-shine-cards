@@ -9,6 +9,7 @@ import { CARD_PALETTE, uploadImage } from "@/lib/upload";
 import { LoyaltyCardPreview } from "@/components/fideo/LoyaltyCardPreview";
 import { NameSpacingHint } from "@/components/fideo/NameSpacingHint";
 import { EstablishmentsSection } from "@/components/fideo/EstablishmentsSection";
+import { GeoRelanceSection } from "@/components/fideo/GeoRelanceSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -373,6 +374,13 @@ function CardSettings() {
       </div>
 
       <EstablishmentsSection merchantId={merchant?.id} />
+
+      <GeoRelanceSection
+        nomCommerce={nomCommerce}
+        active={merchant?.geo_relance_active}
+        rayonM={merchant?.geo_relance_rayon_m}
+        message={merchant?.geo_relance_message}
+      />
     </div>
   );
 }

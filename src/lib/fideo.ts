@@ -33,6 +33,9 @@ export type Merchant = {
   photo_url?: string | null;
   partage_mode?: string | null;
   onboarding_completed?: boolean;
+  geo_relance_active?: boolean;
+  geo_relance_rayon_m?: number;
+  geo_relance_message?: string | null;
 };
 
 export type LoyaltyCard = {
@@ -92,7 +95,7 @@ export function useMerchant() {
       const { data, error } = await supabase
         .from("merchants")
         .select(
-          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status, secteur, photo_url, partage_mode, onboarding_completed",
+          "id, nom_commerce, email, telephone, adresse, logo_url, couleur_marque, trial_ends_at, access_status, secteur, photo_url, partage_mode, onboarding_completed, geo_relance_active, geo_relance_rayon_m, geo_relance_message",
         )
         .eq("user_id", uid)
         .limit(1)
