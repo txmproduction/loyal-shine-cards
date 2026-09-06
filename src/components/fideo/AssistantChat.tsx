@@ -48,6 +48,9 @@ export function AssistantChat() {
   const { data: rewards } = useRewards(ids);
   const addPoint = useAddPoint();
   const removePoint = useRemovePoint();
+  const createCustomer = useCreateCustomer();
+  const deleteCustomer = useDeleteCustomer();
+
   const ask = useServerFn(askAssistant);
 
   const amountMode = isAmountMode(card);
