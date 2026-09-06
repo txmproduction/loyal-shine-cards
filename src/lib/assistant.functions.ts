@@ -2,11 +2,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type AssistantAction = {
-  type: "add" | "remove" | "none";
+  type: "add" | "remove" | "create" | "delete" | "none";
   customer_id: string | null;
   quantity: number | null;
   label: string | null;
+  nom: string | null;
+  prenom: string | null;
+  telephone: string | null;
 };
+
 
 export type AssistantReply = {
   reply: string;
