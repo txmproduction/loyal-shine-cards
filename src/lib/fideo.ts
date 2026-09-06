@@ -33,6 +33,9 @@ export type Merchant = {
   photo_url?: string | null;
   partage_mode?: string | null;
   onboarding_completed?: boolean;
+  geo_relance_active?: boolean;
+  geo_relance_rayon_m?: number;
+  geo_relance_message?: string | null;
 };
 
 export type LoyaltyCard = {
