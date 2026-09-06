@@ -37,13 +37,17 @@ const SCHEMA = {
     action: {
       type: "object",
       additionalProperties: false,
-      required: ["type", "customer_id", "quantity", "label"],
+      required: ["type", "customer_id", "quantity", "label", "nom", "prenom", "telephone"],
       properties: {
-        type: { type: "string", enum: ["add", "remove", "none"] },
+        type: { type: "string", enum: ["add", "remove", "create", "delete", "none"] },
         customer_id: { type: ["string", "null"] },
         quantity: { type: ["number", "null"] },
         label: { type: ["string", "null"] },
+        nom: { type: ["string", "null"] },
+        prenom: { type: ["string", "null"] },
+        telephone: { type: ["string", "null"] },
       },
+
     },
   },
 } as const;
