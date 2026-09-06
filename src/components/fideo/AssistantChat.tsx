@@ -9,7 +9,9 @@ import {
   entryValue,
   isAmountMode,
   useAddPoint,
+  useCreateCustomer,
   useCustomers,
+  useDeleteCustomer,
   useEmployeeSelf,
   useLoyaltyCard,
   useMerchant,
@@ -17,6 +19,7 @@ import {
   useRemovePoint,
   useRewards,
 } from "@/lib/fideo";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -45,6 +48,9 @@ export function AssistantChat() {
   const { data: rewards } = useRewards(ids);
   const addPoint = useAddPoint();
   const removePoint = useRemovePoint();
+  const createCustomer = useCreateCustomer();
+  const deleteCustomer = useDeleteCustomer();
+
   const ask = useServerFn(askAssistant);
 
   const amountMode = isAmountMode(card);
@@ -102,16 +108,38 @@ export function AssistantChat() {
   };
 
   const confirm = async () => {
-    if (!action?.customer_id) return;
-    const qty = Math.abs(Number(action.quantity ?? 1)) || 1;
-    const payload = {
-      customer_id: action.customer_id,
-      employee_id: employee?.id ?? null,
-      establishment_id: null,
-      points: amountMode ? 1 : Math.round(qty),
-      montant: amountMode ? qty : 0,
-    };
+    if (!action) return;
     try {
+      if (action.type === "create") {
+        if (!merchant?.id || !action.nom) throw new Error("Nom du client manquant.");
+        await createCustomer.mutateAsync({
+          merchant_id: merchant.id,
+          nom: action.nom,
+          prenom: action.prenom,
+          telephone: action.telephone,
+        });
+        const done = `Client ${action.label ?? action.nom} créé.`;
+        toast.success(done);
+        setMessages((m) => [...m, { role: "assistant", content: `✅ ${done}` }]);
+        return;
+      }
+      if (action.type === "delete") {
+        if (!action.customer_id) throw new Error("Client introuvable.");
+        await deleteCustomer.mutateAsync({ customer_id: action.customer_id });
+        const done = `Client ${action.label ?? ""} supprimé.`.replace("  ", " ");
+        toast.success(done);
+        setMessages((m) => [...m, { role: "assistant", content: `✅ ${done}` }]);
+        return;
+      }
+      if (!action.customer_id) return;
+      const qty = Math.abs(Number(action.quantity ?? 1)) || 1;
+      const payload = {
+        customer_id: action.customer_id,
+        employee_id: employee?.id ?? null,
+        establishment_id: null,
+        points: amountMode ? 1 : Math.round(qty),
+        montant: amountMode ? qty : 0,
+      };
       if (action.type === "add") await addPoint.mutateAsync(payload);
       else await removePoint.mutateAsync(payload);
       const label = amountMode ? `${qty.toFixed(2)} €` : `${Math.round(qty)} point(s)`;
@@ -125,6 +153,7 @@ export function AssistantChat() {
       scrollDown();
     }
   };
+
 
   return (
     <>
@@ -172,14 +201,36 @@ export function AssistantChat() {
             {action && (
               <div className="rounded-2xl border border-primary/40 bg-primary/5 p-3">
                 <p className="text-xs text-muted-foreground">
-                  {action.type === "add" ? "Ajouter" : "Retirer"}{" "}
-                  {amountMode
-                    ? `${Math.abs(Number(action.quantity ?? 0)).toFixed(2)} €`
-                    : `${Math.abs(Math.round(Number(action.quantity ?? 1)))} point(s)`}{" "}
-                  · {action.label ?? "client"}
+                  {action.type === "create" ? (
+                    <>
+                      Créer le client · {[action.prenom, action.nom].filter(Boolean).join(" ")}
+                      {action.telephone ? ` · ${action.telephone}` : ""}
+                    </>
+                  ) : action.type === "delete" ? (
+                    <>Supprimer définitivement · {action.label ?? "client"}</>
+                  ) : (
+                    <>
+                      {action.type === "add" ? "Ajouter" : "Retirer"}{" "}
+                      {amountMode
+                        ? `${Math.abs(Number(action.quantity ?? 0)).toFixed(2)} €`
+                        : `${Math.abs(Math.round(Number(action.quantity ?? 1)))} point(s)`}{" "}
+                      · {action.label ?? "client"}
+                    </>
+                  )}
                 </p>
                 <div className="mt-2 flex gap-2">
-                  <Button size="sm" onClick={confirm} disabled={addPoint.isPending || removePoint.isPending}>
+                  <Button
+                    size="sm"
+                    variant={action.type === "delete" ? "destructive" : "default"}
+                    onClick={confirm}
+                    disabled={
+                      addPoint.isPending ||
+                      removePoint.isPending ||
+                      createCustomer.isPending ||
+                      deleteCustomer.isPending
+                    }
+                  >
+
                     <Check className="mr-1 h-4 w-4" /> Confirmer
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => setAction(null)}>

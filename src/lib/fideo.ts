@@ -460,6 +460,53 @@ export function useRedeemReward() {
   });
 }
 
+/** Crée un client rattaché au commerçant (utilisé par l'assistant IA). */
+export function useCreateCustomer() {
+  const qc = useQueryClient();
+  const demo = useDemoMode();
+  return useMutation({
+    mutationFn: async (input: {
+      merchant_id: string;
+      nom: string;
+      prenom?: string | null;
+      telephone?: string | null;
+      email?: string | null;
+    }) => {
+      if (demo) return; // Mode démo : aucune écriture en base.
+      const { error } = await supabase.from("customers").insert({
+        merchant_id: input.merchant_id,
+        nom: input.nom,
+        prenom: input.prenom || null,
+        telephone: input.telephone || null,
+        email: input.email || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      if (demo) return;
+      void qc.invalidateQueries();
+    },
+  });
+}
+
+/** Supprime définitivement un client et son historique. */
+export function useDeleteCustomer() {
+  const qc = useQueryClient();
+  const demo = useDemoMode();
+  return useMutation({
+    mutationFn: async (input: { customer_id: string }) => {
+      if (demo) return; // Mode démo : aucune écriture en base.
+      const { error } = await supabase.from("customers").delete().eq("id", input.customer_id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      if (demo) return;
+      void qc.invalidateQueries();
+    },
+  });
+}
+
+
 /* ---------- Analytics helpers ---------- */
 
 export function startOfDay(d: Date) {
