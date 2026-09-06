@@ -102,16 +102,38 @@ export function AssistantChat() {
   };
 
   const confirm = async () => {
-    if (!action?.customer_id) return;
-    const qty = Math.abs(Number(action.quantity ?? 1)) || 1;
-    const payload = {
-      customer_id: action.customer_id,
-      employee_id: employee?.id ?? null,
-      establishment_id: null,
-      points: amountMode ? 1 : Math.round(qty),
-      montant: amountMode ? qty : 0,
-    };
+    if (!action) return;
     try {
+      if (action.type === "create") {
+        if (!merchant?.id || !action.nom) throw new Error("Nom du client manquant.");
+        await createCustomer.mutateAsync({
+          merchant_id: merchant.id,
+          nom: action.nom,
+          prenom: action.prenom,
+          telephone: action.telephone,
+        });
+        const done = `Client ${action.label ?? action.nom} créé.`;
+        toast.success(done);
+        setMessages((m) => [...m, { role: "assistant", content: `✅ ${done}` }]);
+        return;
+      }
+      if (action.type === "delete") {
+        if (!action.customer_id) throw new Error("Client introuvable.");
+        await deleteCustomer.mutateAsync({ customer_id: action.customer_id });
+        const done = `Client ${action.label ?? ""} supprimé.`.replace("  ", " ");
+        toast.success(done);
+        setMessages((m) => [...m, { role: "assistant", content: `✅ ${done}` }]);
+        return;
+      }
+      if (!action.customer_id) return;
+      const qty = Math.abs(Number(action.quantity ?? 1)) || 1;
+      const payload = {
+        customer_id: action.customer_id,
+        employee_id: employee?.id ?? null,
+        establishment_id: null,
+        points: amountMode ? 1 : Math.round(qty),
+        montant: amountMode ? qty : 0,
+      };
       if (action.type === "add") await addPoint.mutateAsync(payload);
       else await removePoint.mutateAsync(payload);
       const label = amountMode ? `${qty.toFixed(2)} €` : `${Math.round(qty)} point(s)`;
@@ -125,6 +147,7 @@ export function AssistantChat() {
       scrollDown();
     }
   };
+
 
   return (
     <>
