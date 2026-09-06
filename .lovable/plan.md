@@ -1,43 +1,32 @@
-# Fidéo sur l'App Store via Capacitor
+# Relance géolocalisée automatique
 
-## Le point bloquant (à décider avant de coder)
+## Le point important à savoir avant de commencer
 
-Fidéo n'est pas une application purement client. Une partie du produit tourne obligatoirement sur un serveur :
+Une page web (même installée comme application) **ne peut pas** suivre la position d'un client en arrière-plan. iOS et Android coupent la géolocalisation dès que le navigateur est fermé ou en arrière-plan. Faire du "geofencing" par le navigateur donnerait donc zéro notification en pratique (et viderait la batterie).
 
-- signature des cartes Apple Wallet (.pkpass) et service web PassKit
-- notifications Apple (APNs) et mises à jour Google Wallet
-- assistant IA, géocodage des adresses, inscription client publique par QR code
+La bonne solution existe déjà et elle est native : **Apple Wallet et Google Wallet déclenchent eux-mêmes une notification sur l'écran verrouillé quand le téléphone s'approche du commerce**, à partir des coordonnées enregistrées dans la carte. Ça fonctionne app fermée, sans autorisation supplémentaire à demander, sur iPhone et Android.
 
-Transformer la sortie en site statique « 100 % client » supprimerait tout cela : plus de carte Wallet, plus de notifications, plus d'assistant. Ce n'est donc pas la bonne route.
+Aujourd'hui les coordonnées sont déjà envoyées dans les cartes, mais :
+- le rayon est figé (150 m) et non réglable ;
+- le texte affiché est générique et non modifiable ;
+- les cartes déjà installées ne sont pas mises à jour quand le commerçant change ces réglages.
 
-**Ce que je propose à la place** : l'app iOS embarque l'interface Fidéo (fichiers compilés livrés dans l'app, pas une simple page web chargée à distance) et continue d'appeler le serveur `fideoloyalty.app` comme une API. C'est exactement le fonctionnement d'une app Capacitor classique et cela reste conforme.
+## Ce qui sera fait
 
-## Ce que je ferai
+1. **Réglages commerçant** (base de données) : rayon de déclenchement (défaut 1,5 km, de 500 m à 5 km), message de relance personnalisable, et interrupteur marche/arrêt.
+2. **Interface** dans la page Carte de fidélité : un curseur pour le rayon, un champ texte pour le message (avec message par défaut proposé), et l'interrupteur.
+3. **Application aux cartes** : le rayon et le texte choisis sont injectés dans la carte Apple (`locations` + `maxDistance` + `relevantText`) et Google (`locations`).
+4. **Mise à jour immédiate** : à l'enregistrement des réglages, les cartes déjà installées chez les clients sont rafraîchies (Apple via notification silencieuse, Google via l'API), donc pas besoin de réinstaller la carte.
 
-1. **Cible de build « app mobile »**
-   - Ajouter un mode de build dédié qui génère l'interface dans `dist/mobile` (HTML + JS embarqués dans l'app iOS), sans toucher au site web actuel ni à ses fonctions serveur.
-   - Ce mode pointe les appels réseau vers `https://fideoloyalty.app`.
+## Sur les points 2 et 3 de la demande
 
-2. **Capacitor**
-   - Installer `@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`.
-   - Créer `capacitor.config.ts` : `appId: "app.fideoloyalty.card"`, `appName: "Fidéo"`, `webDir: "dist/mobile"`.
-
-3. **Fonctions natives (guideline 4.2 d'Apple)**
-   - Scan QR : passer par `@capacitor/camera` (+ un lecteur de code-barres natif) sur iOS, et garder le lecteur web actuel dans le navigateur. Même bouton, même écran, deux moteurs selon la plateforme.
-   - Notifications : `@capacitor/push-notifications` sur iOS (jeton APNs enregistré côté backend), Web Push conservé sur le navigateur.
-   - Ajouts qui renforcent le dossier Apple : partage natif de la carte, vibration/retour haptique au scan réussi, icône et écran de lancement Fidéo.
-
-4. **Instructions finales**
-   - Étapes exactes : export GitHub, `npm install`, `npx cap add ios`, `npx cap sync`, ouverture dans Xcode, signature avec l'équipe **QBR5LW4N8A**, capabilities Push Notifications, permissions caméra, archive et envoi vers App Store Connect.
+- **Uniquement les clients ayant la carte au wallet** : c'est automatique. Seule une carte réellement installée peut déclencher la notification.
+- **Pas de spam** : c'est le système d'exploitation qui gère l'affichage de proximité, il n'affiche pas la carte en boucle pour un même passage. Aucun compteur à écrire de notre côté. À noter : Apple limite chaque carte à 10 lieux, ce qui couvre largement les établissements actuels.
 
 ## Détails techniques
 
-- La config Capacitor n'utilisera **pas** `server.url` (un simple pointeur vers le site distant est précisément ce qu'Apple refuse en 4.2).
-- Les appels serveur passeront par une base d'URL configurable (`VITE_API_BASE_URL`), vide sur le web, `https://fideoloyalty.app` en mobile.
-- Le code natif (`ios/`) est généré chez vous après export : Xcode ne peut pas tourner ici.
-- Le service worker PWA reste désactivé dans le build mobile.
-
-## À confirmer
-
-- OK pour que l'app iOS s'appuie sur le serveur `fideoloyalty.app` (obligatoire pour Wallet/notifications) ?
-- Bundle ID souhaité : `app.fideoloyalty.card` — attention, `pass.app.fideoloyalty.card` est déjà utilisé pour les cartes Wallet, les deux peuvent coexister.
+- Migration : ajout sur `merchants` de `geo_relance_active` (booléen, défaut vrai), `geo_relance_rayon_m` (entier, défaut 1500, contrainte 500–5000) et `geo_relance_message` (texte, nullable).
+- `src/lib/wallet-data.server.ts` : lecture de ces champs et transmission dans l'entrée de carte.
+- `src/lib/apple-wallet.server.ts` : `maxDistance` = rayon configuré, `relevantText` = message configuré ou message par défaut.
+- `src/lib/google-wallet.server.ts` : inchangé côté rayon (Google gère lui-même la portée), locations conservées.
+- `src/routes/_authenticated/carte.tsx` : nouveau bloc « Relance de proximité » ; la sauvegarde déclenche le rafraîchissement des cartes existantes via la logique de synchronisation déjà en place.
