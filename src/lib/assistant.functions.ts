@@ -72,8 +72,12 @@ export const askAssistant = createServerFn({ method: "POST" })
         : `Le programme fonctionne aux PASSAGES : objectif ${data.goal} passages pour obtenir "${data.reward}". quantity = un nombre de points entier.`,
       `Quand l'utilisateur demande d'ajouter ou de retirer des points/montant à un client, identifie le client dans la liste ci-dessous et renvoie action.type = "add" ou "remove", action.customer_id = son id, action.quantity = la quantité (positive), action.label = "Prénom Nom (téléphone)".`,
       `Ne fais jamais l'opération toi-même : formule une demande de confirmation dans "reply", par exemple : "Vous vous apprêtez à retirer 2 points à Patrick Dupont (06 12 34 56 78). Confirmez-vous ?".`,
+      `Quand l'utilisateur demande de CRÉER / ajouter un nouveau client, renvoie action.type = "create" avec action.nom (nom de famille, obligatoire), action.prenom et action.telephone si donnés, action.label = "Prénom Nom". S'il manque le nom, action.type = "none" et demande-le.`,
+      `Quand l'utilisateur demande de SUPPRIMER un client, identifie-le dans la liste et renvoie action.type = "delete", action.customer_id = son id, action.label = "Prénom Nom (téléphone)". Préviens dans "reply" que la suppression efface définitivement son historique.`,
+      `Les champs non utilisés valent null.`,
       `Si le client est introuvable ou ambigu, action.type = "none" et demande une précision.`,
       `Pour toute autre question (fonctionnement de Fidéo, wallet, récompenses, employés, QR codes), réponds simplement avec action.type = "none".`,
+
       `Liste des clients :\n${clients || "(aucun client)"}`,
     ].join("\n");
 
