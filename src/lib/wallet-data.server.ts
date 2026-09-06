@@ -42,7 +42,7 @@ export async function buildWalletCardInput(customerId: string): Promise<WalletCa
   const { data: merchant } = await supabaseAdmin
     .from("merchants")
     .select(
-      "id, nom_commerce, logo_url, photo_url, couleur_marque, access_status, trial_ends_at, message_promo",
+      "id, nom_commerce, logo_url, photo_url, couleur_marque, access_status, trial_ends_at, message_promo, geo_relance_active, geo_relance_rayon_m, geo_relance_message",
     )
     .eq("id", customer.merchant_id)
     .maybeSingle();
