@@ -9,7 +9,9 @@ import {
   entryValue,
   isAmountMode,
   useAddPoint,
+  useCreateCustomer,
   useCustomers,
+  useDeleteCustomer,
   useEmployeeSelf,
   useLoyaltyCard,
   useMerchant,
@@ -17,6 +19,7 @@ import {
   useRemovePoint,
   useRewards,
 } from "@/lib/fideo";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
