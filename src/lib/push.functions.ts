@@ -40,26 +40,43 @@ export const notifyAdminsNewMerchant = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { sendWebPush } = await import("./webpush.server");
+    const { sendApnsAlert } = await import("./apns.server");
 
     const { data: rows } = await supabaseAdmin
       .from("admin_push_subscriptions")
       .select("endpoint, subscription");
     if (!rows?.length) return { sent: 0 };
 
+    const title = "Nouvelle inscription commerçant";
+    const body = `${data.nomCommerce} vient de créer un compte Fidéo (${data.email}).`;
+
     let sent = 0;
     for (const row of rows) {
-      // Les jetons de l'app iOS native (APNs) ne passent pas par le Web Push.
-      if (row.endpoint.startsWith("apns:")) continue;
       try {
+        // Jetons de l'app iOS native : envoi direct via APNs.
+        if (row.endpoint.startsWith("apns:")) {
+          const token = row.endpoint.slice("apns:".length);
+          const res = await sendApnsAlert(token, { title, body, url: "/admin" });
+          if (res.ok) sent += 1;
+          else if (
+            res.status === 410 ||
+            res.reason === "BadDeviceToken" ||
+            res.reason === "Unregistered" ||
+            res.reason === "DeviceTokenNotForTopic"
+          ) {
+            await supabaseAdmin
+              .from("admin_push_subscriptions")
+              .delete()
+              .eq("endpoint", row.endpoint);
+          }
+          continue;
+        }
+
         const sub = row.subscription as unknown as {
           endpoint: string;
           keys: { p256dh: string; auth: string };
         };
-        const res = await sendWebPush(sub, {
-          title: "Nouvelle inscription commerçant",
-          body: `${data.nomCommerce} vient de créer un compte Fidéo (${data.email}).`,
-          url: "/admin",
-        });
+        const res = await sendWebPush(sub, { title, body, url: "/admin" });
         if (res.ok) sent += 1;
         else if (res.status === 404 || res.status === 410) {
           await supabaseAdmin.from("admin_push_subscriptions").delete().eq("endpoint", row.endpoint);
@@ -69,6 +86,7 @@ export const notifyAdminsNewMerchant = createServerFn({ method: "POST" })
       }
     }
     return { sent };
+
   });
 /** Enregistre le jeton APNs de l'app iOS native (Capacitor) pour un admin. */
 export const saveNativePushToken = createServerFn({ method: "POST" })
