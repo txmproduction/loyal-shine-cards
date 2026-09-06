@@ -123,6 +123,10 @@ export type WalletCardInput = {
   locationName?: string | undefined;
   promoMessage?: string | undefined;
   locations?: Array<{ latitude: number; longitude: number }> | undefined;
+  /** Rayon de relance de proximité en mètres (Apple `maxDistance`). */
+  geoRadiusMeters?: number | undefined;
+  /** Texte affiché sur l'écran verrouillé à proximité du commerce. */
+  geoMessage?: string | undefined;
 };
 
 function buildLoyaltyObject(input: WalletCardInput, issuerId: string) {

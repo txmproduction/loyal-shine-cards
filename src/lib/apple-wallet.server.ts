@@ -140,9 +140,11 @@ export function buildPassJson(input: WalletCardInput, serialNumber: string, orig
           locations: input.locations.slice(0, 10).map((l) => ({
             latitude: l.latitude,
             longitude: l.longitude,
-            relevantText: `À proximité de ${input.issuerName} — présentez votre carte !`,
+            relevantText:
+              input.geoMessage?.trim() ||
+              `Vous passez près de ${input.issuerName} ! Passez faire tamponner votre carte Fidéo 🎉`,
           })),
-          maxDistance: 150,
+          maxDistance: Math.min(5000, Math.max(500, Math.round(input.geoRadiusMeters ?? 1500))),
         }
       : {}),
     webServiceURL: `${origin}/api/public/passes/`,
