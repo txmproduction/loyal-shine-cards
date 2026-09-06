@@ -146,16 +146,27 @@ export const askAssistant = createServerFn({ method: "POST" })
       }
     }
 
+    const NONE: AssistantAction = {
+      type: "none",
+      customer_id: null,
+      quantity: null,
+      label: null,
+      nom: null,
+      prenom: null,
+      telephone: null,
+    };
+
     try {
       const parsed = JSON.parse(text) as AssistantReply;
       return {
         reply: parsed.reply || "Je n'ai pas compris, pouvez-vous reformuler ?",
-        action: parsed.action ?? { type: "none", customer_id: null, quantity: null, label: null },
+        action: parsed.action ?? NONE,
       };
     } catch {
       return {
         reply: text.trim() || "Je n'ai pas compris, pouvez-vous reformuler ?",
-        action: { type: "none", customer_id: null, quantity: null, label: null },
+        action: NONE,
       };
     }
   });
+
