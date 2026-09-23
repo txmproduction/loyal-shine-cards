@@ -58,13 +58,20 @@ function AuthPage() {
   };
 
   const oauth = async (provider: "google" | "apple") => {
+    if (provider === "apple") {
+      // Identifiants Apple propres à Fidéo : la fenêtre Apple affiche « Fidéo ».
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "apple",
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) toast.error("Connexion Apple impossible");
+      return;
+    }
     const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
-      toast.error(
-        provider === "google" ? "Connexion Google impossible" : "Connexion Apple impossible",
-      );
+      toast.error("Connexion Google impossible");
       return;
     }
   };
