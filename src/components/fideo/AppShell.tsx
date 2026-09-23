@@ -56,11 +56,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
     void navigate({ to: "/clients", search: { c: id } });
   };
+  const SETTINGS = { to: "/parametres", label: "Paramètres du compte", icon: Settings } as const;
   const nav = employee
-    ? ([{ to: "/clients", label: "Mes clients", icon: Users }] as const)
+    ? ([{ to: "/clients", label: "Mes clients", icon: Users }, SETTINGS] as const)
     : isAdmin
-      ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const]
-      : NAV;
+      ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const, SETTINGS]
+      : [...NAV, SETTINGS];
 
   const signOut = async () => {
     await supabase.auth.signOut();
