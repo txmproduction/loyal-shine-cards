@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLine, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLine, ChevronDown, Settings } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { QrScanner } from "@/components/fideo/QrScanner";
