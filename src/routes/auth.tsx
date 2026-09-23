@@ -57,12 +57,14 @@ function AuthPage() {
     }
   };
 
-  const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
+  const oauth = async (provider: "google" | "apple") => {
+    const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
-      toast.error("Connexion Google impossible");
+      toast.error(
+        provider === "google" ? "Connexion Google impossible" : "Connexion Apple impossible",
+      );
       return;
     }
   };
