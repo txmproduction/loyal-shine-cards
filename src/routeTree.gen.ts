@@ -21,6 +21,7 @@ import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticated/employes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
 import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
 import { Route as ApiPublicApplePassCustomerIdRouteImport } from './routes/api/public/apple-pass/$customerId'
 import { Route as ApiPublicPassesV1LogRouteImport } from './routes/api/public/passes/v1/log'
@@ -87,6 +88,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedParametresRoute = AuthenticatedParametresRouteImport.update({
+  id: '/parametres',
+  path: '/parametres',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
   id: '/rejoindre/$code',
   path: '/rejoindre/$code',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/parametres': typeof AuthenticatedParametresRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
   '/api/public/passes/v1/log': typeof ApiPublicPassesV1LogRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/employes': typeof AuthenticatedEmployesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/parametres': typeof AuthenticatedParametresRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
   '/api/public/passes/v1/log': typeof ApiPublicPassesV1LogRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/employes': typeof AuthenticatedEmployesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/parametres': typeof AuthenticatedParametresRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
   '/api/public/passes/v1/log': typeof ApiPublicPassesV1LogRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/employes'
     | '/onboarding'
+    | '/parametres'
     | '/rejoindre/$code'
     | '/api/public/apple-pass/$customerId'
     | '/api/public/passes/v1/log'
@@ -217,6 +227,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/employes'
     | '/onboarding'
+    | '/parametres'
     | '/rejoindre/$code'
     | '/api/public/apple-pass/$customerId'
     | '/api/public/passes/v1/log'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/employes'
     | '/_authenticated/onboarding'
+    | '/_authenticated/parametres'
     | '/rejoindre/$code'
     | '/api/public/apple-pass/$customerId'
     | '/api/public/passes/v1/log'
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/parametres': {
+      id: '/_authenticated/parametres'
+      path: '/parametres'
+      fullPath: '/parametres'
+      preLoaderRoute: typeof AuthenticatedParametresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/rejoindre/$code': {
       id: '/rejoindre/$code'
       path: '/rejoindre/$code'
@@ -397,6 +416,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmployesRoute: typeof AuthenticatedEmployesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedParametresRoute: typeof AuthenticatedParametresRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -406,6 +426,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmployesRoute: AuthenticatedEmployesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedParametresRoute: AuthenticatedParametresRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

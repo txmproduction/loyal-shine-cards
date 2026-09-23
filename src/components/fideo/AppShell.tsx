@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLine, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Users, IdCard, BadgeCheck, LogOut, ShieldCheck, ScanLine, ChevronDown, Settings } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { QrScanner } from "@/components/fideo/QrScanner";
@@ -56,11 +56,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
     void navigate({ to: "/clients", search: { c: id } });
   };
+  const SETTINGS = { to: "/parametres", label: "Paramètres du compte", icon: Settings } as const;
   const nav = employee
-    ? ([{ to: "/clients", label: "Mes clients", icon: Users }] as const)
+    ? ([{ to: "/clients", label: "Mes clients", icon: Users }, SETTINGS] as const)
     : isAdmin
-      ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const]
-      : NAV;
+      ? [...NAV, { to: "/admin", label: "Administration", icon: ShieldCheck } as const, SETTINGS]
+      : [...NAV, SETTINGS];
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -146,6 +147,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => void navigate({ to: "/parametres" })}>
+                <Settings className="mr-2 h-4 w-4" /> Paramètres du compte
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={signOut}>
                 <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
               </DropdownMenuItem>
