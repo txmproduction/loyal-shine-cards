@@ -147,6 +147,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => void navigate({ to: "/parametres" })}>
+                <Settings className="mr-2 h-4 w-4" /> Paramètres du compte
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={signOut}>
                 <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
               </DropdownMenuItem>
