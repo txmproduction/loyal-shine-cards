@@ -128,7 +128,11 @@ function ScanCounterPage() {
       setError(friendlyError(e.message));
       return;
     }
-    const res = data as ScanResult;
+    const res = data as ScanResult & { error?: string };
+    if (res.error) {
+      setError(friendlyError(res.error));
+      return;
+    }
     setResult(res);
     // Met à jour la carte Wallet du client (Google + push Apple), sans bloquer l'écran.
     void refreshWallet({ data: { customer_id: res.customer_id } }).catch(() => undefined);
@@ -251,34 +255,19 @@ function ScanCounterPage() {
         <p className="text-sm text-muted-foreground">
           Validez votre passage en quelques secondes : votre point est ajouté automatiquement.
         </p>
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="nom">Nom</Label>
-            <Input id="nom" value={nom} onChange={(e) => setNom(e.target.value)} autoComplete="family-name" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="prenom">Prénom</Label>
-            <Input
-              id="prenom"
-              value={prenom}
-              onChange={(e) => setPrenom(e.target.value)}
-              autoComplete="given-name"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="tel">Numéro de téléphone</Label>
-            <Input
-              id="tel"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-              inputMode="tel"
-              autoComplete="tel"
-              placeholder="06 12 34 56 78"
-            />
-            <p className="text-xs text-muted-foreground">
-              Votre numéro sert à retrouver votre carte. Maximum 1 point par jour.
-            </p>
-          </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="tel">Numéro de téléphone</Label>
+          <Input
+            id="tel"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="06 12 34 56 78"
+          />
+          <p className="text-xs text-muted-foreground">
+            Le même numéro que celui donné à l'inscription. Maximum 1 point par jour.
+          </p>
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button className="w-full" onClick={submit} disabled={saving}>
