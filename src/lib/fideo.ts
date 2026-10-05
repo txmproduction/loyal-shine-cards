@@ -61,6 +61,7 @@ export type Establishment = {
   nom: string;
   adresse: string | null;
   public_code: string;
+  scan_client_enabled?: boolean | null;
 };
 
 export type Customer = {
@@ -231,7 +232,7 @@ export function useEstablishments(merchantId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("establishments")
-        .select("id, nom, adresse, public_code")
+        .select("id, nom, adresse, public_code, scan_client_enabled")
         .eq("merchant_id", merchantId!)
         .order("nom");
       if (error) throw error;

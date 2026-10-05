@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Download, Lock } from "lucide-react";
+import { Download, Lock, ScanLine } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { accessState, useEstablishments, useMerchant } from "@/lib/fideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { QrImage } from "@/components/fideo/QrImage";
 
 export function EstablishmentsSection({ merchantId }: { merchantId?: string | undefined }) {
@@ -53,6 +54,19 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
     refresh();
   };
 
+  const toggleScan = async (id: string, enabled: boolean) => {
+    const { error } = await supabase
+      .from("establishments")
+      .update({ scan_client_enabled: enabled })
+      .eq("id", id);
+    if (error) {
+      toast.error("Modification impossible", { description: error.message });
+      return;
+    }
+    toast.success(enabled ? "Scan comptoir activé" : "Scan comptoir désactivé");
+    refresh();
+  };
+
   const download = (url: string, nom: string) => {
     void import("qrcode").then(async (m) => {
       const data = await m.toDataURL(url, { width: 1024, margin: 2 });
@@ -80,6 +94,7 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
       <ul className="mt-4 space-y-4">
         {(establishments ?? []).map((e) => {
           const url = `${origin}/rejoindre/${e.public_code}`;
+          const scanUrl = `${origin}/scan-client/${e.public_code}`;
           const d = drafts[e.id] ?? { nom: e.nom, adresse: e.adresse ?? "" };
           return (
             <li key={e.id} className="rounded-xl bg-secondary p-4">
@@ -128,6 +143,42 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
                 ) : (
                   <div className="h-fit rounded-xl bg-white p-2">
                     <QrImage value={url} size={128} alt={`QR code ${e.nom}`} />
+                  </div>
+                )}
+              </div>
+              <div className="mt-4 border-t border-border pt-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="space-y-0.5">
+                    <p className="flex items-center gap-1.5 text-sm font-semibold">
+                      <ScanLine className="h-4 w-4" /> QR comptoir — point automatique
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Le client scanne avec son téléphone, tape son numéro et gagne 1 point
+                      (1 maximum par jour).
+                    </p>
+                  </div>
+                  <Switch
+                    checked={e.scan_client_enabled !== false}
+                    onCheckedChange={(v) => void toggleScan(e.id, v)}
+                    aria-label="Activer le scan au comptoir"
+                  />
+                </div>
+                {!locked && e.scan_client_enabled !== false && (
+                  <div className="mt-3 flex items-center gap-3">
+                    <div className="h-fit rounded-xl bg-white p-2">
+                      <QrImage value={scanUrl} size={96} alt={`QR comptoir ${e.nom}`} />
+                    </div>
+                    <div className="space-y-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={locked}
+                        onClick={() => download(scanUrl, `comptoir-${e.nom}`)}
+                      >
+                        <Download className="mr-1 h-4 w-4" /> QR comptoir
+                      </Button>
+                      <p className="break-all text-[11px] text-muted-foreground">{scanUrl}</p>
+                    </div>
                   </div>
                 )}
               </div>
