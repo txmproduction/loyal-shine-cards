@@ -170,6 +170,7 @@ export type Database = {
           merchant_id: string
           nom: string
           public_code: string
+          scan_client_enabled: boolean
         }
         Insert: {
           adresse?: string | null
@@ -180,6 +181,7 @@ export type Database = {
           merchant_id: string
           nom: string
           public_code?: string
+          scan_client_enabled?: boolean
         }
         Update: {
           adresse?: string | null
@@ -190,6 +192,7 @@ export type Database = {
           merchant_id?: string
           nom?: string
           public_code?: string
+          scan_client_enabled?: boolean
         }
         Relationships: [
           {
@@ -456,6 +459,15 @@ export type Database = {
           _telephone: string
         }
         Returns: string
+      }
+      scan_client_public: {
+        Args: {
+          _code: string
+          _nom: string
+          _prenom: string
+          _telephone: string
+        }
+        Returns: Json
       }
     }
     Enums: {
