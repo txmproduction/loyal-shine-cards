@@ -23,6 +23,7 @@ import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
 import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
+import { Route as ScanClientCodeRouteImport } from './routes/scan-client.$code'
 import { Route as ApiPublicApplePassCustomerIdRouteImport } from './routes/api/public/apple-pass/$customerId'
 import { Route as ApiPublicPassesV1LogRouteImport } from './routes/api/public/passes/v1/log'
 import { Route as ApiPublicPassesV1PassesPassTypeIdSerialRouteImport } from './routes/api/public/passes/v1/passes/$passTypeId/$serial'
@@ -98,6 +99,11 @@ const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
   path: '/rejoindre/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScanClientCodeRoute = ScanClientCodeRouteImport.update({
+  id: '/scan-client/$code',
+  path: '/scan-client/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicApplePassCustomerIdRoute =
   ApiPublicApplePassCustomerIdRouteImport.update({
     id: '/api/public/apple-pass/$customerId',
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/parametres': typeof AuthenticatedParametresRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
+  '/scan-client/$code': typeof ScanClientCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
   '/api/public/passes/v1/log': typeof ApiPublicPassesV1LogRoute
   '/api/public/passes/v1/passes/$passTypeId/$serial': typeof ApiPublicPassesV1PassesPassTypeIdSerialRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/parametres': typeof AuthenticatedParametresRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
+  '/scan-client/$code': typeof ScanClientCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
   '/api/public/passes/v1/log': typeof ApiPublicPassesV1LogRoute
   '/api/public/passes/v1/passes/$passTypeId/$serial': typeof ApiPublicPassesV1PassesPassTypeIdSerialRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/parametres': typeof AuthenticatedParametresRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
+  '/scan-client/$code': typeof ScanClientCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
   '/api/public/passes/v1/log': typeof ApiPublicPassesV1LogRoute
   '/api/public/passes/v1/passes/$passTypeId/$serial': typeof ApiPublicPassesV1PassesPassTypeIdSerialRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/parametres'
     | '/rejoindre/$code'
+    | '/scan-client/$code'
     | '/api/public/apple-pass/$customerId'
     | '/api/public/passes/v1/log'
     | '/api/public/passes/v1/passes/$passTypeId/$serial'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/parametres'
     | '/rejoindre/$code'
+    | '/scan-client/$code'
     | '/api/public/apple-pass/$customerId'
     | '/api/public/passes/v1/log'
     | '/api/public/passes/v1/passes/$passTypeId/$serial'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/parametres'
     | '/rejoindre/$code'
+    | '/scan-client/$code'
     | '/api/public/apple-pass/$customerId'
     | '/api/public/passes/v1/log'
     | '/api/public/passes/v1/passes/$passTypeId/$serial'
@@ -265,6 +277,7 @@ export interface RootRouteChildren {
   DpaRoute: typeof DpaRoute
   PrivacyRoute: typeof PrivacyRoute
   RejoindreCodeRoute: typeof RejoindreCodeRoute
+  ScanClientCodeRoute: typeof ScanClientCodeRoute
   ApiPublicApplePassCustomerIdRoute: typeof ApiPublicApplePassCustomerIdRoute
   ApiPublicPassesV1LogRoute: typeof ApiPublicPassesV1LogRoute
   ApiPublicPassesV1PassesPassTypeIdSerialRoute: typeof ApiPublicPassesV1PassesPassTypeIdSerialRoute
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RejoindreCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scan-client/$code': {
+      id: '/scan-client/$code'
+      path: '/scan-client/$code'
+      fullPath: '/scan-client/$code'
+      preLoaderRoute: typeof ScanClientCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/apple-pass/$customerId': {
       id: '/api/public/apple-pass/$customerId'
       path: '/api/public/apple-pass/$customerId'
@@ -455,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   DpaRoute: DpaRoute,
   PrivacyRoute: PrivacyRoute,
   RejoindreCodeRoute: RejoindreCodeRoute,
+  ScanClientCodeRoute: ScanClientCodeRoute,
   ApiPublicApplePassCustomerIdRoute: ApiPublicApplePassCustomerIdRoute,
   ApiPublicPassesV1LogRoute: ApiPublicPassesV1LogRoute,
   ApiPublicPassesV1PassesPassTypeIdSerialRoute:
