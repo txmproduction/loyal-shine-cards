@@ -76,8 +76,6 @@ type ScanResult = {
 
 function ScanCounterPage() {
   const { code } = Route.useParams();
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
   const [telephone, setTelephone] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -114,15 +112,15 @@ function ScanCounterPage() {
 
   const submit = async () => {
     setError("");
-    if (!nom.trim() || !telephone.trim()) {
-      setError("Nom et téléphone sont obligatoires.");
+    if (!telephone.trim()) {
+      setError("Entrez votre numéro de téléphone.");
       return;
     }
     setSaving(true);
     const { data, error: e } = await supabase.rpc("scan_client_public", {
       _code: code,
-      _nom: nom.trim(),
-      _prenom: prenom.trim(),
+      _nom: "",
+      _prenom: "",
       _telephone: telephone.trim(),
     });
     setSaving(false);
@@ -130,7 +128,11 @@ function ScanCounterPage() {
       setError(friendlyError(e.message));
       return;
     }
-    const res = data as ScanResult;
+    const res = data as ScanResult & { error?: string };
+    if (res.error) {
+      setError(friendlyError(res.error));
+      return;
+    }
     setResult(res);
     // Met à jour la carte Wallet du client (Google + push Apple), sans bloquer l'écran.
     void refreshWallet({ data: { customer_id: res.customer_id } }).catch(() => undefined);
@@ -253,34 +255,19 @@ function ScanCounterPage() {
         <p className="text-sm text-muted-foreground">
           Validez votre passage en quelques secondes : votre point est ajouté automatiquement.
         </p>
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="nom">Nom</Label>
-            <Input id="nom" value={nom} onChange={(e) => setNom(e.target.value)} autoComplete="family-name" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="prenom">Prénom</Label>
-            <Input
-              id="prenom"
-              value={prenom}
-              onChange={(e) => setPrenom(e.target.value)}
-              autoComplete="given-name"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="tel">Numéro de téléphone</Label>
-            <Input
-              id="tel"
-              value={telephone}
-              onChange={(e) => setTelephone(e.target.value)}
-              inputMode="tel"
-              autoComplete="tel"
-              placeholder="06 12 34 56 78"
-            />
-            <p className="text-xs text-muted-foreground">
-              Votre numéro sert à retrouver votre carte. Maximum 1 point par jour.
-            </p>
-          </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="tel">Numéro de téléphone</Label>
+          <Input
+            id="tel"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            inputMode="tel"
+            autoComplete="tel"
+            placeholder="06 12 34 56 78"
+          />
+          <p className="text-xs text-muted-foreground">
+            Le même numéro que celui donné à l'inscription. Maximum 1 point par jour.
+          </p>
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button className="w-full" onClick={submit} disabled={saving}>
@@ -292,14 +279,20 @@ function ScanCounterPage() {
 }
 
 function friendlyError(message: string) {
-  if (message.includes("Établissement introuvable")) {
+  if (message.includes("unknown_phone")) {
+    return "Numéro inconnu : demandez au commerçant de vous inscrire (QR d'inscription), puis revenez scanner.";
+  }
+  if (message.includes("not_found") || message.includes("Établissement introuvable")) {
     return "Ce QR code n'est pas valide.";
   }
-  if (message.includes("désactivé")) {
+  if (message.includes("disabled") || message.includes("désactivé")) {
     return "Le scan au comptoir est désactivé pour ce commerce.";
   }
-  if (message.includes("momentanément indisponible")) {
+  if (message.includes("inactive") || message.includes("momentanément indisponible")) {
     return "Programme momentanément indisponible. Merci de réessayer plus tard.";
+  }
+  if (message.includes("invalid")) {
+    return "Numéro de téléphone invalide.";
   }
   return message;
 }
