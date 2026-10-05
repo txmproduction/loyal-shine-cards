@@ -76,8 +76,6 @@ type ScanResult = {
 
 function ScanCounterPage() {
   const { code } = Route.useParams();
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
   const [telephone, setTelephone] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -114,15 +112,15 @@ function ScanCounterPage() {
 
   const submit = async () => {
     setError("");
-    if (!nom.trim() || !telephone.trim()) {
-      setError("Nom et téléphone sont obligatoires.");
+    if (!telephone.trim()) {
+      setError("Entrez votre numéro de téléphone.");
       return;
     }
     setSaving(true);
     const { data, error: e } = await supabase.rpc("scan_client_public", {
       _code: code,
-      _nom: nom.trim(),
-      _prenom: prenom.trim(),
+      _nom: "",
+      _prenom: "",
       _telephone: telephone.trim(),
     });
     setSaving(false);
