@@ -182,16 +182,22 @@ function ScanCounterPage() {
     return (
       <Centered>
         <div className="animate-rise space-y-5 rounded-3xl border border-border bg-card p-6 text-center shadow-soft">
-          <span className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
-            <Check className="h-6 w-6" />
-          </span>
+          {result.already ? (
+            <span className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15 text-2xl font-black text-amber-500">
+              !
+            </span>
+          ) : (
+            <span className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-500">
+              <Check className="h-6 w-6" />
+            </span>
+          )}
           <div>
-            <h1 className="text-xl font-extrabold">
-              {result.already ? "Déjà validé aujourd'hui" : isMobile ? "Point ajouté 🎉" : "Passage validé"}
+            <h1 className={"text-xl font-extrabold " + (result.already ? "text-amber-500" : "")}>
+              {result.already ? "Aucun point ajouté" : isMobile ? "Point ajouté 🎉" : "Passage validé"}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {result.already
-                ? "Vous avez déjà reçu votre point il y a moins de 24 h. À demain !"
+                ? "Votre passage a déjà été validé aujourd'hui (1 point maximum par 24 h). Revenez demain !"
                 : place.nom_commerce + " vous remercie. À très vite !"}
             </p>
           </div>
