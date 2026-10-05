@@ -19,7 +19,7 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
   const [origin, setOrigin] = useState("");
   const [drafts, setDrafts] = useState<Record<string, { nom: string; adresse: string }>>({});
 
-  useEffect(() => setOrigin(window.location.origin), []);
+  useEffect(() => { const o = window.location.origin; setOrigin(/lovable\.(app|dev)|localhost/.test(o) ? "https://fideoloyalty.app" : o); }, []);
 
   useEffect(() => {
     if (!establishments) return;
