@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Download, Lock } from "lucide-react";
+import { Download, Lock, ScanLine } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { accessState, useEstablishments, useMerchant } from "@/lib/fideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { QrImage } from "@/components/fideo/QrImage";
 
 export function EstablishmentsSection({ merchantId }: { merchantId?: string | undefined }) {
@@ -50,6 +51,19 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
     if (d.adresse.trim()) {
       void geocoderEtablissement({ data: { establishment_id: id } }).catch(() => undefined);
     }
+    refresh();
+  };
+
+  const toggleScan = async (id: string, enabled: boolean) => {
+    const { error } = await supabase
+      .from("establishments")
+      .update({ scan_client_enabled: enabled })
+      .eq("id", id);
+    if (error) {
+      toast.error("Modification impossible", { description: error.message });
+      return;
+    }
+    toast.success(enabled ? "Scan comptoir activé" : "Scan comptoir désactivé");
     refresh();
   };
 
