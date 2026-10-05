@@ -279,14 +279,20 @@ function ScanCounterPage() {
 }
 
 function friendlyError(message: string) {
-  if (message.includes("Établissement introuvable")) {
+  if (message.includes("unknown_phone")) {
+    return "Numéro inconnu : demandez au commerçant de vous inscrire (QR d'inscription), puis revenez scanner.";
+  }
+  if (message.includes("not_found") || message.includes("Établissement introuvable")) {
     return "Ce QR code n'est pas valide.";
   }
-  if (message.includes("désactivé")) {
+  if (message.includes("disabled") || message.includes("désactivé")) {
     return "Le scan au comptoir est désactivé pour ce commerce.";
   }
-  if (message.includes("momentanément indisponible")) {
+  if (message.includes("inactive") || message.includes("momentanément indisponible")) {
     return "Programme momentanément indisponible. Merci de réessayer plus tard.";
+  }
+  if (message.includes("invalid")) {
+    return "Numéro de téléphone invalide.";
   }
   return message;
 }
