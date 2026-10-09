@@ -264,7 +264,7 @@ export async function buildSaveUrl(input: WalletCardInput, origin: string): Prom
     await walletFetch(token, `/loyaltyClass/${classId}`, "PUT", loyaltyClass);
   } else if (existingClass.status === 404) {
     const created = await walletFetch(token, `/loyaltyClass`, "POST", loyaltyClass);
-    if (!created.ok) throw new Error(`Création de la classe Wallet impossible (${created.status})`);
+    if (!created.ok) console.error(JSON.stringify(created.json)); if (!created.ok) throw new Error(`Création de la classe Wallet impossible (${created.status})`);
   } else {
     throw new Error(`Google Wallet indisponible (${existingClass.status})`);
   }
