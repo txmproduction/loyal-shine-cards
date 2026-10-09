@@ -263,7 +263,9 @@ export async function buildSaveUrl(input: WalletCardInput, origin: string): Prom
   if (existingClass.ok) {
     await walletFetch(token, `/loyaltyClass/${classId}`, "PUT", loyaltyClass);
   } else if (existingClass.status === 404) {
-    const created = await walletFetch(token, `/loyaltyClass`, "POST", loyaltyClass);
+    // Google n'accepte que UNDER_REVIEW à la création d'une classe.
+    const created = await walletFetch(token, `/loyaltyClass`, "POST", { ...loyaltyClass, reviewStatus: "UNDER_REVIEW" });
+    if (!created.ok) console.error("[Wallet] class create", JSON.stringify(created.json));
     if (!created.ok) throw new Error(`Création de la classe Wallet impossible (${created.status})`);
   } else {
     throw new Error(`Google Wallet indisponible (${existingClass.status})`);
