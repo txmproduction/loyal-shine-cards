@@ -39,6 +39,10 @@ export const Route = createFileRoute("/scan-client/$code")({
       <p className="text-sm text-muted-foreground">Établissement introuvable.</p>
     </Centered>
   ),
+  validateSearch: (search: Record<string, unknown>): { points?: number } => {
+    const n = Number(search["points"]);
+    return search["points"] === undefined ? {} : { points: Number.isFinite(n) ? n : -1 };
+  },
   component: ScanCounterPage,
 });
 
@@ -76,6 +80,10 @@ type ScanResult = {
 
 function ScanCounterPage() {
   const { code } = Route.useParams();
+  const search = Route.useSearch();
+  const points = search.points ?? 1;
+  const pointsValid = Number.isInteger(points) && points >= 1 && points <= 3;
+  const pointsLabel = `+${points} point${points > 1 ? "s" : ""}`;
   const [telephone, setTelephone] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -116,12 +124,17 @@ function ScanCounterPage() {
       setError("Entrez votre numéro de téléphone.");
       return;
     }
+    if (!pointsValid) {
+      setError("Ce QR code n'est pas valide.");
+      return;
+    }
     setSaving(true);
     const { data, error: e } = await supabase.rpc("scan_client_public", {
       _code: code,
       _nom: "",
       _prenom: "",
       _telephone: telephone.trim(),
+      _points: points,
     });
     setSaving(false);
     if (e) {
@@ -178,7 +191,6 @@ function ScanCounterPage() {
 
   if (result) {
     const amountMode = result.mode === "montant";
-    const isMobile = typeof navigator !== "undefined" && /iPhone|iPad|Android/i.test(navigator.userAgent);
     return (
       <Centered>
         <div className="animate-rise space-y-5 rounded-3xl border border-border bg-card p-6 text-center shadow-soft">
@@ -193,7 +205,7 @@ function ScanCounterPage() {
           )}
           <div>
             <h1 className={"text-xl font-extrabold " + (result.already ? "text-amber-500" : "")}>
-              {result.already ? "Aucun point ajouté" : isMobile ? "Point ajouté 🎉" : "Passage validé"}
+              {result.already ? "Aucun point ajouté" : `${pointsLabel} ajouté${points > 1 ? "s" : ""} 🎉`}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {result.already
@@ -258,8 +270,11 @@ function ScanCounterPage() {
             <p className="text-xs text-muted-foreground">{place.establishment_nom}</p>
           </div>
         </header>
+        <div className="rounded-2xl bg-primary/15 py-3 text-center text-2xl font-black text-primary">
+          {pointsValid ? pointsLabel : "QR invalide"}
+        </div>
         <p className="text-sm text-muted-foreground">
-          Validez votre passage en quelques secondes : votre point est ajouté automatiquement.
+          Validez votre passage en quelques secondes : vos points sont ajoutés automatiquement.
         </p>
         <div className="space-y-1.5">
           <Label htmlFor="tel">Numéro de téléphone</Label>
@@ -296,6 +311,9 @@ function friendlyError(message: string) {
   }
   if (message.includes("inactive") || message.includes("momentanément indisponible")) {
     return "Programme momentanément indisponible. Merci de réessayer plus tard.";
+  }
+  if (message.includes("invalid_points")) {
+    return "Ce QR code n'est pas valide.";
   }
   if (message.includes("invalid")) {
     return "Numéro de téléphone invalide.";

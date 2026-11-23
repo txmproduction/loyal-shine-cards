@@ -153,8 +153,8 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
                       <ScanLine className="h-4 w-4" /> QR comptoir — point automatique
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Le client scanne avec son téléphone, tape son numéro et gagne 1 point
-                      (1 maximum par jour).
+                      Le client scanne avec son téléphone, tape son numéro et gagne 1, 2 ou 3 points
+                      selon la carte scannée (1 passage maximum par jour).
                     </p>
                   </div>
                   <Switch
@@ -164,21 +164,21 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
                   />
                 </div>
                 {!locked && e.scan_client_enabled !== false && (
-                  <div className="mt-3 flex items-center gap-3">
-                    <div className="h-fit rounded-xl bg-white p-2">
-                      <QrImage value={scanUrl} size={96} alt={`QR comptoir ${e.nom}`} />
-                    </div>
-                    <div className="space-y-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={locked}
-                        onClick={() => download(scanUrl, `comptoir-${e.nom}`)}
-                      >
-                        <Download className="mr-1 h-4 w-4" /> QR comptoir
-                      </Button>
-                      <p className="break-all text-[11px] text-muted-foreground">{scanUrl}</p>
-                    </div>
+                  <div className="mt-3 grid grid-cols-3 gap-3">
+                    {[1, 2, 3].map((n) => {
+                      const u = n === 1 ? scanUrl : `${scanUrl}?points=${n}`;
+                      return (
+                        <div key={n} className="flex flex-col items-center gap-2">
+                          <p className="text-sm font-black text-primary">+{n} point{n > 1 ? "s" : ""}</p>
+                          <div className="h-fit rounded-xl bg-white p-2">
+                            <QrImage value={u} size={88} alt={`QR comptoir +${n} ${e.nom}`} />
+                          </div>
+                          <Button size="sm" variant="outline" onClick={() => download(u, `comptoir-${n}pt-${e.nom}`)}>
+                            <Download className="mr-1 h-4 w-4" /> +{n}
+                          </Button>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

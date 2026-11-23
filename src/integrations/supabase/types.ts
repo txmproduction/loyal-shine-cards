@@ -464,6 +464,7 @@ export type Database = {
         Args: {
           _code: string
           _nom: string
+          _points?: number
           _prenom: string
           _telephone: string
         }
