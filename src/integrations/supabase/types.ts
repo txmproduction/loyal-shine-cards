@@ -171,6 +171,7 @@ export type Database = {
           nom: string
           public_code: string
           scan_client_enabled: boolean
+          scan_limite_24h: boolean
         }
         Insert: {
           adresse?: string | null
@@ -182,6 +183,7 @@ export type Database = {
           nom: string
           public_code?: string
           scan_client_enabled?: boolean
+          scan_limite_24h?: boolean
         }
         Update: {
           adresse?: string | null
@@ -193,6 +195,7 @@ export type Database = {
           nom?: string
           public_code?: string
           scan_client_enabled?: boolean
+          scan_limite_24h?: boolean
         }
         Relationships: [
           {

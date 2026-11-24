@@ -287,7 +287,7 @@ function ScanCounterPage() {
             placeholder="06 12 34 56 78"
           />
           <p className="text-xs text-muted-foreground">
-            Le même numéro que celui donné à l'inscription. Maximum 1 point par jour.
+            Le même numéro que celui donné à l'inscription.
           </p>
         </div>
         {error && <p className="text-sm text-destructive">{error}</p>}

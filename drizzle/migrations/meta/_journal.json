@@ -8,6 +8,13 @@
       "when": 1795467961055,
       "tag": "0000_scan_client_points",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795539279905,
+      "tag": "0001_scan_limit_toggle",
+      "breakpoints": true
     }
   ]
 }

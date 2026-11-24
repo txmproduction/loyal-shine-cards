@@ -154,7 +154,7 @@ export function EstablishmentsSection({ merchantId }: { merchantId?: string | un
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Le client scanne avec son téléphone, tape son numéro et gagne 1, 2 ou 3 points
-                      selon la carte scannée (1 passage maximum par jour).
+                      selon la carte scannée.
                     </p>
                   </div>
                   <Switch
