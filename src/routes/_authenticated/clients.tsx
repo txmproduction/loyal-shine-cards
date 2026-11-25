@@ -89,6 +89,8 @@ function ClientsPage() {
   );
 
   const [search, setSearch] = useState("");
+  const [walletFilter, setWalletFilter] = useState<"all" | "with" | "without">("all");
+  const hasWallet = (id: string) => appleActive.has(id) || googleActive.has(id);
   const [open, setOpen] = useState<string | null>(null);
   const [scanOpen, setScanOpen] = useState(false);
   const [active, setActive] = useState<Customer | null>(null);
@@ -183,6 +185,9 @@ function ClientsPage() {
         .toLowerCase()
         .includes(search.toLowerCase()),
     )
+    .filter((c) =>
+      walletFilter === "all" ? true : walletFilter === "with" ? hasWallet(c.id) : !hasWallet(c.id),
+    )
     .map((c) => {
       const history = (points ?? []).filter((p) => p.customer_id === c.id);
       const earned = history.reduce((a, p) => a + entryValue(card, p), 0);
@@ -190,9 +195,14 @@ function ClientsPage() {
       return { customer: c, history, balance: Math.max(0, earned - used), earned };
     });
 
+  const visibleCustomers = (customers ?? []).filter(
+    (c) => !myCustomerIds || myCustomerIds.has(c.id),
+  );
+  const withWalletCount = visibleCustomers.filter((c) => hasWallet(c.id)).length;
+
   const cardLink = (c: Customer) => `https://fideoloyalty.app/c/${c.share_token}`;
   const shareMessage = (c: Customer) =>
-    `Bonjour ${c.prenom ?? c.nom ?? ""}, voici votre carte de fidélité ${merchant?.nom_commerce ?? ""} : ${cardLink(c)} — appuyez sur Ajouter à Apple Wallet`;
+    `Bonjour ${c.prenom ?? c.nom ?? ""}, voici votre carte de fidélité ${merchant?.nom_commerce ?? ""} : ${cardLink(c)} — Appuyez UNE SEULE FOIS sur Ajouter à Apple Wallet et patientez 10 à 15 secondes, la page Wallet va s'afficher. N'appuyez pas plusieurs fois.`;
   const waPhone = (t: string | null) => {
     const d = (t ?? "").replace(/\D/g, "");
     return d.startsWith("0") ? `33${d.slice(1)}` : d;
@@ -221,6 +231,27 @@ function ClientsPage() {
             iconUrl={merchant?.logo_url ?? merchant?.photo_url ?? null}
           />
         )}
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-semibold">
+            {withWalletCount} / {visibleCustomers.length} clients ont la carte dans leur wallet
+          </span>
+          <div className="flex gap-1 rounded-xl bg-secondary p-1">
+            {([["all", "Tous"], ["with", "Avec carte"], ["without", "Sans carte"]] as const).map(([k, l]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setWalletFilter(k)}
+                className={
+                  walletFilter === k
+                    ? "bg-brand rounded-lg px-3 py-1 text-xs font-semibold text-primary-foreground"
+                    : "rounded-lg px-3 py-1 text-xs font-medium text-muted-foreground"
+                }
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -245,7 +276,18 @@ function ClientsPage() {
                     {customerName(customer).slice(0, 1).toUpperCase()}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold">{customerName(customer)}</span>
+                    <span className="flex flex-wrap items-center gap-1.5">
+                      <span className="truncate text-sm font-semibold">{customerName(customer)}</span>
+                      {appleActive.has(customer.id) && (
+                        <span className="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-semibold text-success">Apple Wallet ✓</span>
+                      )}
+                      {googleActive.has(customer.id) && (
+                        <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">Google Wallet</span>
+                      )}
+                      {!hasWallet(customer.id) && (
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">Pas de carte</span>
+                      )}
+                    </span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {customer.telephone ?? customer.email ?? "—"} ·{" "}
                       {amountMode ? `${fmt(earned)} cumulés` : `${earned} passages au total`}

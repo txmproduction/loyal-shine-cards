@@ -49,6 +49,7 @@ function SharedCardPage() {
   const [os, setOs] = useState<"ios" | "android" | "other">("other");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [appleBusy, setAppleBusy] = useState(false);
   const createGoogle = useServerFn(generateWalletCard);
 
   useEffect(() => {
@@ -68,6 +69,9 @@ function SharedCardPage() {
   }
 
   const apple = () => {
+    if (appleBusy) return;
+    setAppleBusy(true);
+    window.setTimeout(() => setAppleBusy(false), 20000);
     window.location.href = `/api/public/apple-pass/${card.customerId}`;
   };
   const google = async () => {
@@ -84,8 +88,8 @@ function SharedCardPage() {
   };
 
   const appleBtn = (
-    <Button key="a" size="lg" variant={os === "android" ? "secondary" : "default"} className="w-full" onClick={apple}>
-      <Apple className="mr-2 h-5 w-5" /> Ajouter à Apple Wallet
+    <Button key="a" size="lg" variant={os === "android" ? "secondary" : "default"} className="w-full" onClick={apple} disabled={appleBusy}>
+      <Apple className="mr-2 h-5 w-5" /> {appleBusy ? "Ouverture de Wallet… patientez 10-15 s" : "Ajouter à Apple Wallet"}
     </Button>
   );
   const googleBtn = (
