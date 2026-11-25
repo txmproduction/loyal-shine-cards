@@ -73,6 +73,7 @@ export type Customer = {
   created_at: string;
   apple_wallet_pass_id: string | null;
   google_wallet_pass_id: string | null;
+  share_token?: string | null;
 };
 
 export type PointEntry = {
@@ -251,7 +252,7 @@ export function useCustomers(merchantId?: string) {
       const { data, error } = await supabase
         .from("customers")
         .select(
-          "id, nom, prenom, email, telephone, created_at, apple_wallet_pass_id, google_wallet_pass_id",
+          "id, nom, prenom, email, telephone, created_at, apple_wallet_pass_id, google_wallet_pass_id, share_token",
         )
         .eq("merchant_id", merchantId!)
         .order("created_at", { ascending: false });

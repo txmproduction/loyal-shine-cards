@@ -15,6 +15,13 @@
       "when": 1795539279905,
       "tag": "0001_scan_limit_toggle",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795638132937,
+      "tag": "0002_customer_share_token",
+      "breakpoints": true
     }
   ]
 }

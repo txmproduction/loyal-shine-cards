@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getWalletStatuses } from "@/lib/wallet.functions";
-import { Apple, Gift, QrCode, ScanLine, Search, Smartphone } from "lucide-react";
+import { Apple, Copy, Gift, MessageCircle, QrCode, ScanLine, Search, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import {
   cardGoal,
@@ -190,6 +190,18 @@ function ClientsPage() {
       return { customer: c, history, balance: Math.max(0, earned - used), earned };
     });
 
+  const cardLink = (c: Customer) => `https://fideoloyalty.app/c/${c.share_token}`;
+  const shareMessage = (c: Customer) =>
+    `Bonjour ${c.prenom ?? c.nom ?? ""}, voici votre carte de fidélité ${merchant?.nom_commerce ?? ""} : ${cardLink(c)} — appuyez sur Ajouter à Apple Wallet`;
+  const waPhone = (t: string | null) => {
+    const d = (t ?? "").replace(/\D/g, "");
+    return d.startsWith("0") ? `33${d.slice(1)}` : d;
+  };
+  const copyLink = async (c: Customer) => {
+    await navigator.clipboard.writeText(cardLink(c));
+    toast.success("Lien copié");
+  };
+
   const fmt = (n: number) => (amountMode ? `${n.toFixed(2)} €` : `${n}`);
 
   return (
@@ -265,6 +277,27 @@ function ClientsPage() {
                       {googleActive.has(customer.id) ? "Google Wallet — actif" : "Google Wallet — non généré"}
                     </span>
                   </div>
+                  {customer.share_token && (
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      <Button size="sm" variant="outline" onClick={() => copyLink(customer)}>
+                        <Copy className="mr-2 h-4 w-4" /> Copier le lien de la carte
+                      </Button>
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={`sms:${customer.telephone ?? ""}?&body=${encodeURIComponent(shareMessage(customer))}`}>
+                          <MessageCircle className="mr-2 h-4 w-4" /> SMS
+                        </a>
+                      </Button>
+                      <Button size="sm" variant="outline" asChild>
+                        <a
+                          href={`https://wa.me/${waPhone(customer.telephone)}?text=${encodeURIComponent(shareMessage(customer))}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
+                        </a>
+                      </Button>
+                    </div>
+                  )}
                   <ol className="space-y-1.5">
                     {history.slice(0, 12).map((h) => (
                       <li key={h.id} className="flex justify-between text-xs">

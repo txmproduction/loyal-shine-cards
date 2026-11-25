@@ -79,6 +79,7 @@ export type Database = {
           merchant_id: string
           nom: string | null
           prenom: string | null
+          share_token: string
           telephone: string | null
         }
         Insert: {
@@ -91,6 +92,7 @@ export type Database = {
           merchant_id: string
           nom?: string | null
           prenom?: string | null
+          share_token?: string
           telephone?: string | null
         }
         Update: {
@@ -103,6 +105,7 @@ export type Database = {
           merchant_id?: string
           nom?: string | null
           prenom?: string | null
+          share_token?: string
           telephone?: string | null
         }
         Relationships: [

@@ -81,3 +81,62 @@ export const getWalletStatuses = createServerFn({ method: "POST" })
       google: (allowed ?? []).filter((c) => c.google_wallet_pass_id).map((c) => c.id),
     };
   });
+
+/** Page publique /c/:token — données d'affichage de la carte d'un client (lien secret). */
+export const getSharedCard = createServerFn({ method: "GET" })
+  .inputValidator((input: { token: string }) => {
+    const token = String(input?.token ?? "").trim();
+    if (!/^[0-9a-f]{32}$/i.test(token)) throw new Error("Lien invalide");
+    return { token };
+  })
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: c } = await supabaseAdmin
+      .from("customers")
+      .select("id, prenom, nom, merchant_id")
+      .eq("share_token", data.token)
+      .maybeSingle();
+    if (!c) return null;
+    const [{ data: m }, { data: card }, { data: hist }, { count: redeemed }] = await Promise.all([
+      supabaseAdmin
+        .from("merchants")
+        .select("nom_commerce, logo_url, photo_url, couleur_marque, access_status, trial_ends_at")
+        .eq("id", c.merchant_id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("loyalty_cards")
+        .select("mode_recompense, nb_points_pour_recompense, montant_pour_recompense, valeur_recompense")
+        .eq("merchant_id", c.merchant_id)
+        .maybeSingle(),
+      supabaseAdmin.from("points_history").select("points_ajoutes, montant").eq("customer_id", c.id),
+      supabaseAdmin
+        .from("rewards_redeemed")
+        .select("id", { count: "exact", head: true })
+        .eq("customer_id", c.id),
+    ]);
+    if (!m) return null;
+    const amount = card?.mode_recompense === "montant";
+    const goal = amount
+      ? Number(card?.montant_pour_recompense ?? 100)
+      : Number(card?.nb_points_pour_recompense ?? 10);
+    const earned = (hist ?? []).reduce(
+      (s, r) => s + (amount ? Number(r.montant ?? 0) : Number(r.points_ajoutes ?? 0)),
+      0,
+    );
+    const active =
+      m.access_status === "active" ||
+      (m.access_status === "trial" && new Date(m.trial_ends_at).getTime() > Date.now());
+    return {
+      customerId: c.id,
+      titulaire: [c.prenom, c.nom].filter(Boolean).join(" "),
+      nomCommerce: m.nom_commerce,
+      logoUrl: m.logo_url,
+      photoUrl: m.photo_url,
+      couleur: m.couleur_marque,
+      mode: amount ? ("montant" as const) : ("passages" as const),
+      goal,
+      points: Math.max(0, earned - (redeemed ?? 0) * goal),
+      reward: card?.valeur_recompense ?? "Récompense offerte",
+      active,
+    };
+  });

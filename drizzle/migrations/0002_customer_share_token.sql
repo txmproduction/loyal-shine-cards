@@ -1,0 +1,2 @@
+ALTER TABLE public.customers ADD COLUMN IF NOT EXISTS share_token text NOT NULL DEFAULT encode(extensions.gen_random_bytes(16), 'hex');
+CREATE UNIQUE INDEX IF NOT EXISTS customers_share_token_key ON public.customers(share_token);

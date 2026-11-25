@@ -22,6 +22,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedEmployesRouteImport } from './routes/_authenticated/employes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedParametresRouteImport } from './routes/_authenticated/parametres'
+import { Route as CTokenRouteImport } from './routes/c.$token'
 import { Route as RejoindreCodeRouteImport } from './routes/rejoindre.$code'
 import { Route as ScanClientCodeRouteImport } from './routes/scan-client.$code'
 import { Route as ApiPublicApplePassCustomerIdRouteImport } from './routes/api/public/apple-pass/$customerId'
@@ -94,6 +95,11 @@ const AuthenticatedParametresRoute = AuthenticatedParametresRouteImport.update({
   path: '/parametres',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const CTokenRoute = CTokenRouteImport.update({
+  id: '/c/$token',
+  path: '/c/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RejoindreCodeRoute = RejoindreCodeRouteImport.update({
   id: '/rejoindre/$code',
   path: '/rejoindre/$code',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/employes': typeof AuthenticatedEmployesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/parametres': typeof AuthenticatedParametresRoute
+  '/c/$token': typeof CTokenRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/scan-client/$code': typeof ScanClientCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/employes': typeof AuthenticatedEmployesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/parametres': typeof AuthenticatedParametresRoute
+  '/c/$token': typeof CTokenRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/scan-client/$code': typeof ScanClientCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
@@ -194,6 +202,7 @@ export interface FileRoutesById {
   '/_authenticated/employes': typeof AuthenticatedEmployesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/parametres': typeof AuthenticatedParametresRoute
+  '/c/$token': typeof CTokenRoute
   '/rejoindre/$code': typeof RejoindreCodeRoute
   '/scan-client/$code': typeof ScanClientCodeRoute
   '/api/public/apple-pass/$customerId': typeof ApiPublicApplePassCustomerIdRoute
@@ -217,6 +226,7 @@ export interface FileRouteTypes {
     | '/employes'
     | '/onboarding'
     | '/parametres'
+    | '/c/$token'
     | '/rejoindre/$code'
     | '/scan-client/$code'
     | '/api/public/apple-pass/$customerId'
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/employes'
     | '/onboarding'
     | '/parametres'
+    | '/c/$token'
     | '/rejoindre/$code'
     | '/scan-client/$code'
     | '/api/public/apple-pass/$customerId'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/_authenticated/employes'
     | '/_authenticated/onboarding'
     | '/_authenticated/parametres'
+    | '/c/$token'
     | '/rejoindre/$code'
     | '/scan-client/$code'
     | '/api/public/apple-pass/$customerId'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   CgvRoute: typeof CgvRoute
   DpaRoute: typeof DpaRoute
   PrivacyRoute: typeof PrivacyRoute
+  CTokenRoute: typeof CTokenRoute
   RejoindreCodeRoute: typeof RejoindreCodeRoute
   ScanClientCodeRoute: typeof ScanClientCodeRoute
   ApiPublicApplePassCustomerIdRoute: typeof ApiPublicApplePassCustomerIdRoute
@@ -377,6 +390,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedParametresRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/c/$token': {
+      id: '/c/$token'
+      path: '/c/$token'
+      fullPath: '/c/$token'
+      preLoaderRoute: typeof CTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rejoindre/$code': {
       id: '/rejoindre/$code'
       path: '/rejoindre/$code'
@@ -474,6 +494,7 @@ const rootRouteChildren: RootRouteChildren = {
   CgvRoute: CgvRoute,
   DpaRoute: DpaRoute,
   PrivacyRoute: PrivacyRoute,
+  CTokenRoute: CTokenRoute,
   RejoindreCodeRoute: RejoindreCodeRoute,
   ScanClientCodeRoute: ScanClientCodeRoute,
   ApiPublicApplePassCustomerIdRoute: ApiPublicApplePassCustomerIdRoute,
