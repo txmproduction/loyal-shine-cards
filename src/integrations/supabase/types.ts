@@ -73,6 +73,7 @@ export type Database = {
           apple_wallet_pass_id: string | null
           created_at: string
           email: string | null
+          employee_id: string | null
           establishment_id: string | null
           google_wallet_pass_id: string | null
           id: string
@@ -86,6 +87,7 @@ export type Database = {
           apple_wallet_pass_id?: string | null
           created_at?: string
           email?: string | null
+          employee_id?: string | null
           establishment_id?: string | null
           google_wallet_pass_id?: string | null
           id?: string
@@ -99,6 +101,7 @@ export type Database = {
           apple_wallet_pass_id?: string | null
           created_at?: string
           email?: string | null
+          employee_id?: string | null
           establishment_id?: string | null
           google_wallet_pass_id?: string | null
           id?: string

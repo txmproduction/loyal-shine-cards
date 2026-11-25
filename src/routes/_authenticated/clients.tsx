@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getWalletStatuses } from "@/lib/wallet.functions";
-import { Apple, Copy, Gift, MessageCircle, QrCode, ScanLine, Search, Smartphone } from "lucide-react";
+import { Apple, Copy, Gift, MessageCircle, Plus, QrCode, ScanLine, Search, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import {
   cardGoal,
@@ -12,6 +12,7 @@ import {
   isAmountMode,
   useAddPoint,
   useCustomers,
+  useEstablishments,
   useEmployeeSelf,
   useLoyaltyCard,
   useMerchant,
@@ -24,6 +25,7 @@ import {
 import { QrImage } from "@/components/fideo/QrImage";
 import { QrScanner } from "@/components/fideo/QrScanner";
 import { NotifyFlow } from "@/components/fideo/NotifyFlow";
+import { CardLinkDialog } from "@/components/fideo/CardLinkDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -97,6 +99,8 @@ function ClientsPage() {
   const [amount, setAmount] = useState("1");
   const [opMode, setOpMode] = useState<"add" | "remove">("add");
   const [qrFor, setQrFor] = useState<Customer | null>(null);
+  const [linkOpen, setLinkOpen] = useState(false);
+  const { data: establishments } = useEstablishments(merchant?.id);
 
   const amountMode = isAmountMode(card);
   const goal = cardGoal(card);
@@ -105,9 +109,12 @@ function ClientsPage() {
   const myCustomerIds = useMemo(() => {
     if (!employee) return null;
     return new Set(
-      (points ?? []).filter((p) => p.employee_id === employee.id).map((p) => p.customer_id),
+      [
+        ...(points ?? []).filter((p) => p.employee_id === employee.id).map((p) => p.customer_id),
+        ...(customers ?? []).filter((c) => c.employee_id === employee.id).map((c) => c.id),
+      ],
     );
-  }, [employee, points]);
+  }, [employee, points, customers]);
 
   const balanceOf = (id: string) => {
     const earned = (points ?? [])
@@ -201,8 +208,9 @@ function ClientsPage() {
   const withWalletCount = visibleCustomers.filter((c) => hasWallet(c.id)).length;
 
   const cardLink = (c: Customer) => `https://fideoloyalty.app/c/${c.share_token}`;
-  const shareMessage = (c: Customer) =>
-    `Bonjour ${c.prenom ?? c.nom ?? ""}, voici votre carte de fidélité ${merchant?.nom_commerce ?? ""} : ${cardLink(c)} — Appuyez UNE SEULE FOIS sur Ajouter à Apple Wallet et patientez 10 à 15 secondes, la page Wallet va s'afficher. N'appuyez pas plusieurs fois.`;
+  const shareMessage = (c: Customer) => linkMessage(c.prenom ?? c.nom ?? "", cardLink(c));
+  const linkMessage = (prenom: string, link: string) =>
+    `Bonjour ${prenom}, voici votre carte de fidélité ${merchant?.nom_commerce ?? ""} : ${link} — Appuyez UNE SEULE FOIS sur Ajouter à Apple Wallet et patientez 10 à 15 secondes, la page Wallet va s'afficher. N'appuyez pas plusieurs fois.`;
   const waPhone = (t: string | null) => {
     const d = (t ?? "").replace(/\D/g, "");
     return d.startsWith("0") ? `33${d.slice(1)}` : d;
@@ -221,9 +229,24 @@ function ClientsPage() {
           <h1 className="text-3xl font-extrabold">Clients</h1>
           <p className="text-sm text-muted-foreground">{rows.length} client(s)</p>
         </div>
-        <Button size="lg" className="w-full sm:w-auto" onClick={() => setScanOpen(true)}>
-          <ScanLine className="mr-2 h-5 w-5" /> Scanner un client
-        </Button>
+        <div className="grid gap-2 sm:flex">
+          <Button size="lg" className="w-full sm:w-auto" onClick={() => setScanOpen(true)}>
+            <ScanLine className="mr-2 h-5 w-5" /> Scanner un client
+          </Button>
+          <Button size="lg" variant="outline" className="w-full sm:w-auto" onClick={() => setLinkOpen(true)}>
+            <Plus className="mr-2 h-5 w-5" /> Créer un lien carte
+          </Button>
+        </div>
+        <CardLinkDialog
+          open={linkOpen}
+          onOpenChange={setLinkOpen}
+          merchantId={merchant?.id}
+          merchantName={merchant?.nom_commerce ?? ""}
+          employeeId={employee?.id ?? null}
+          establishments={establishments ?? []}
+          customers={customers ?? []}
+          shareMessage={linkMessage}
+        />
         {!employee && (
           <NotifyFlow
             count={new Set([...appleActive, ...googleActive]).size}
